@@ -876,7 +876,7 @@ namespace MajdataEdit.SyntaxModule
             int index = 0;
             var _s = s.Split("[");
             string header = _s[0];
-            bool isTouch = header[0] == 'C';
+            bool isTouch = "ABCDE".Contains(header[0]);
 
             if (!isTouch && !int.TryParse(s[0..1], out index))//总是检查第1位
                 return false;
@@ -884,7 +884,7 @@ namespace MajdataEdit.SyntaxModule
                 return false;
             if (s.Length < 2 || header.Length < 2)
                 return false;
-            else if (header is ("Ch" or "C1h" or "Chf" or "C1hf"))//TouchHold特例
+            else if (isTouch && header.Contains('h'))//TouchHold支持所有区域
                 return true;
             //Hold严格判定：第二位必须是'h'，'b'，'x'不限制位置
             //妥协一下，改为松判定
