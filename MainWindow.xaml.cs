@@ -69,6 +69,10 @@ public partial class MainWindow : Window
         waveStopMonitorTimer.Elapsed += WaveStopMonitorTimer_Elapsed;
         playbackSpeedHideTimer.Elapsed += PlbHideTimer_Elapsed;
 
+        // Initialize and start the control file watcher
+        _controlFileWatcher = new ControlFileWatcher(this);
+        _controlFileWatcher.StartWatching();
+
         if (editorSetting!.AutoCheckUpdate) CheckUpdate(true);
 
         #region 异常退出处理
@@ -153,6 +157,9 @@ public partial class MainWindow : Window
 
         // 正常退出
         SafeTerminationDetector.Of().RecordProgramClose();
+        
+        // Stop the control file watcher
+        _controlFileWatcher?.Dispose();
         
         // 释放控制台
         FreeConsole();

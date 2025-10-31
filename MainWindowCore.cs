@@ -45,6 +45,7 @@ public partial class MainWindow : Window
     public static readonly SemVersion MAJDATA_VERSION = SemVersion.Parse(MAJDATA_VERSION_STRING, SemVersionStyles.Any);
 
     public static string maidataDir = "";
+    private ControlFileWatcher? _controlFileWatcher;
 
     //float[] wavedBs;
     private readonly short[][] waveRaws = new short[3][];
@@ -244,15 +245,19 @@ public partial class MainWindow : Window
     }
 
     //*FILE CONTROL
-    private void initFromFile(string path) //file name should not be included in path
+    public void initFromFile(string path, string? maidataFilename = null, string? trackFilename = null) //file name should not be included in path
     {
         if (soundSetting != null) soundSetting.Close();
         if (editorSetting == null) ReadEditorSetting();
 
-        var useOgg = File.Exists(path + "/track.ogg");
+        // Use provided filenames or fall back to defaults
+        var actualMaidataFilename = maidataFilename ?? "maidata.txt";
+        var actualTrackFilename = trackFilename ?? "track";
 
-        var audioPath = path + "/track" + (useOgg ? ".ogg" : ".mp3");
-        var dataPath = path + "/maidata.txt";
+        var useOgg = File.Exists(path + "/" + actualTrackFilename + ".ogg");
+
+        var audioPath = path + "/" + actualTrackFilename + (useOgg ? ".ogg" : ".mp3");
+        var dataPath = path + "/" + actualMaidataFilename;
         if (!File.Exists(audioPath))
         {
             MessageBox.Show(GetLocalizedString("NoTrack"), GetLocalizedString("Error"));
