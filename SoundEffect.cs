@@ -399,9 +399,7 @@ public partial class MainWindow
         //默认参数：16bit
         string getBasePath(string rawPath) { return rawPath.Split('/').Last(); }
 
-        var useOgg = File.Exists(maidataDir + "/track.ogg");
-
-        var bgmBank = new SoundBank(maidataDir + "/track" + (useOgg ? ".ogg" : ".mp3"));
+        var bgmBank = new SoundBank(maidataDir + "/" + MainWindow.currentTrackFilename);
 
         var comparableBanks = new Dictionary<string, SoundBank>();
 
