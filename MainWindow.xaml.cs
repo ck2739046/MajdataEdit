@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Media;
+using System.Runtime.InteropServices;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
@@ -23,8 +24,16 @@ namespace MajdataEdit;
 /// </summary>
 public partial class MainWindow : Window
 {
+    [DllImport("kernel32.dll")]
+    static extern bool AllocConsole();
+    
+    [DllImport("kernel32.dll")]
+    static extern bool FreeConsole();
     public MainWindow()
     {
+        // 分配控制台用于调试输出
+        AllocConsole();
+        
         InitializeComponent();
         if (Environment.GetCommandLineArgs().Contains("--ForceSoftwareRender"))
         {
@@ -143,6 +152,9 @@ public partial class MainWindow : Window
 
         // 正常退出
         SafeTerminationDetector.Of().RecordProgramClose();
+        
+        // 释放控制台
+        FreeConsole();
     }
 
     //Window grid events
