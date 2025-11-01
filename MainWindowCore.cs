@@ -1139,6 +1139,32 @@ public partial class MainWindow : Window
 
 
     //*VIEW COMMUNICATION
+    
+    /// <summary>
+    /// Broadcast message to App (port 8014) in embed mode
+    /// </summary>
+    private void BroadcastToApp(string json)
+    {
+        if (!embed_mode) return;
+        
+        Task.Run(() =>
+        {
+            try
+            {
+                using (var udpClient = new System.Net.Sockets.UdpClient())
+                {
+                    var bytes = System.Text.Encoding.UTF8.GetBytes(json);
+                    var endpoint = new System.Net.IPEndPoint(System.Net.IPAddress.Loopback, 8014);
+                    udpClient.Send(bytes, bytes.Length, endpoint);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[MajdataEdit] Failed to send to App: {ex.Message}");
+            }
+        });
+    }
+    
     private bool sendRequestStop()
     {
         var requestStop = new EditRequestjson
@@ -1146,6 +1172,10 @@ public partial class MainWindow : Window
             control = EditorControlMethod.Stop
         };
         var json = JsonConvert.SerializeObject(requestStop);
+        
+        // Broadcast to App in embed mode
+        BroadcastToApp(json);
+        
         var response = WebControl.RequestPOST("http://localhost:8013/", json);
         if (response == "ERROR")
         {
@@ -1164,6 +1194,10 @@ public partial class MainWindow : Window
             control = EditorControlMethod.Pause
         };
         var json = JsonConvert.SerializeObject(requestStop);
+        
+        // Broadcast to App in embed mode
+        BroadcastToApp(json);
+        
         var response = WebControl.RequestPOST("http://localhost:8013/", json);
         if (response == "ERROR")
         {
@@ -1185,6 +1219,10 @@ public partial class MainWindow : Window
             audioSpeed = GetPlaybackSpeed()
         };
         var json = JsonConvert.SerializeObject(request);
+        
+        // Broadcast to App in embed mode
+        BroadcastToApp(json);
+        
         var response = WebControl.RequestPOST("http://localhost:8013/", json);
         if (response == "ERROR")
         {
@@ -1241,6 +1279,10 @@ public partial class MainWindow : Window
         });
 
         json = JsonConvert.SerializeObject(request);
+        
+        // Broadcast to App in embed mode
+        BroadcastToApp(json);
+        
         var response = WebControl.RequestPOST("http://localhost:8013/", json);
         if (response == "ERROR")
         {
