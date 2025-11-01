@@ -115,6 +115,17 @@ public partial class MainWindow : Window
     }
 
     //Window events
+    private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        // 当窗口尺寸改变时，立即重新初始化波形显示
+        // 这确保了在嵌入场景或手动调整窗口大小时都能正确更新
+        if (WaveBitmap != null)
+        {
+            InitWave();
+            DrawWave();
+        }
+    }
+
     private void Window_Closing(object? sender, CancelEventArgs e)
     {
         if (!isSaved)

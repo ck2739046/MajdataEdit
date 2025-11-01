@@ -642,9 +642,13 @@ public partial class MainWindow : Window
 
     private void InitWave()
     {
-        var width = (int)Width - 2;
+        // 使用 TopMenu 的实际宽度，它跨越整个窗口宽度（Grid.ColumnSpan="3"）
+        // 在嵌入场景下，ActualWidth 会反映真实的渲染宽度，而 Window.Width 可能不准确
+        // 经过实测，ActualWidth+16才与Width相等 (1920x1080, windows缩放100%)
+        var new_width = TopMenu.ActualWidth > 10 ? (int)TopMenu.ActualWidth + 16 - 2 : (int)Width - 2;
         var height = (int)MusicWave.Height;
-        WaveBitmap = new WriteableBitmap(width, height, 72, 72, PixelFormats.Pbgra32, null);
+        Console.WriteLine($"InitWave - Window.Width: {Width}, TopMenu.ActualWidth: {TopMenu.ActualWidth}, Using width: {new_width}");
+        WaveBitmap = new WriteableBitmap(new_width, height, 72, 72, PixelFormats.Pbgra32, null);
         MusicWave.Source = WaveBitmap;
     }
 
@@ -938,7 +942,9 @@ public partial class MainWindow : Window
     {
         if (Bass.BASS_ChannelIsActive(bgmStream) == BASSActive.BASS_ACTIVE_PLAYING)
             TogglePause();
-        delta = delta * deltatime / (Width / 2);
+        var new_width = TopMenu.ActualWidth > 10 ? (float)TopMenu.ActualWidth + 16 : (float)Width;
+        // Console.WriteLine($"ScrollWave - Window.Width: {Width}, TopMenu.ActualWidth: {TopMenu.ActualWidth}");
+        delta = delta * deltatime / (new_width / 2);
         var time = Bass.BASS_ChannelBytes2Seconds(bgmStream, Bass.BASS_ChannelGetPosition(bgmStream));
         SetBgmPosition(time + delta);
         SimaiProcess.ClearNoteListPlayedState();
@@ -1344,8 +1350,9 @@ public partial class MainWindow : Window
         // 属于你的独享黄金位置
         var ScreenWidth = SystemParameters.PrimaryScreenWidth;
         var ScreenHeight = SystemParameters.PrimaryScreenHeight;
+        var new_width = TopMenu.ActualWidth > 10 ? (float)TopMenu.ActualWidth + 16 : (float)Width;
 
-        Left = (ScreenWidth - Width + Height) / 2 - 10;
+        Left = (ScreenWidth - new_width + Height) / 2 - 10;
         Top = (ScreenHeight - Height) / 2;
     }
 

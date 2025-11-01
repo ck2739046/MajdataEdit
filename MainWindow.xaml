@@ -9,7 +9,7 @@
     lex:ResxLocalizationProvider.DefaultDictionary="Langs"
     x:Name="TheWindow" x:Class="MajdataEdit.MainWindow"
     mc:Ignorable="d"
-    Title="MajdataEdit" Height="502" Width="720.5" Loaded="Window_Loaded" Closing="Window_Closing" MinHeight="517"
+    Title="MajdataEdit" Height="502" Width="720.5" Loaded="Window_Loaded" Closing="Window_Closing" SizeChanged="Window_SizeChanged" MinHeight="517"
     WindowStartupLocation="CenterScreen">
 
     <Grid Margin="0" DragEnter="Grid_DragEnter" AllowDrop="True" Drop="Grid_Drop">
@@ -30,7 +30,7 @@
         <Line StrokeThickness="3" Y2="56" Height="74" VerticalAlignment="Bottom" Stroke="Red" Y1="15" Grid.Column="1"
               HorizontalAlignment="Left" Width="45" />
 
-        <Menu Height="19" VerticalAlignment="Top" Background="{DynamicResource ButtonsBackground}"
+        <Menu x:Name="TopMenu" Height="19" VerticalAlignment="Top" Background="{DynamicResource ButtonsBackground}"
               Foreground="{DynamicResource ButtonForeground}" Grid.ColumnSpan="2">
             <MenuItem Header="{lex:Loc Files}" Foreground="{DynamicResource ButtonForeground}"
                       Template="{DynamicResource DarkMenuItem}">
