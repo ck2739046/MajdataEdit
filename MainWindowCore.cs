@@ -1471,26 +1471,27 @@ public partial class MainWindow : Window
 
     public string GetWindowsTitleString(string info)
     {
-        try
-        {
-            var details = "Editing: " + SimaiProcess.title;
-            if (details.Length > 50)
-                details = details[..50];
-            DCRPCclient.SetPresence(new RichPresence
-            {
-                Details = details,
-                State = "With note count of " + SimaiProcess.notelist.Count,
-                Assets = new Assets
-                {
-                    LargeImageKey = "salt",
-                    LargeImageText = "Majdata",
-                    SmallImageKey = "None"
-                }
-            });
-        }
-        catch
-        {
-        }
+        // Discord RPC disabled to prevent connection timeout errors
+        // try
+        // {
+        //     var details = "Editing: " + SimaiProcess.title;
+        //     if (details.Length > 50)
+        //         details = details[..50];
+        //     DCRPCclient.SetPresence(new RichPresence
+        //     {
+        //         Details = details,
+        //         State = "With note count of " + SimaiProcess.notelist.Count,
+        //         Assets = new Assets
+        //         {
+        //             LargeImageKey = "salt",
+        //             LargeImageText = "Majdata",
+        //             SmallImageKey = "None"
+        //         }
+        //     });
+        // }
+        // catch
+        // {
+        // }
 
         return GetWindowsTitleString() + " - " + info;
     }

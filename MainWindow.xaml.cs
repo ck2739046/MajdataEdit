@@ -40,8 +40,9 @@ public partial class MainWindow : Window
 
         SetWindowGoldenPosition();
 
-        DCRPCclient.Logger = new ConsoleLogger { Level = LogLevel.Warning };
-        DCRPCclient.Initialize();
+        // Discord RPC disabled to prevent connection timeout errors
+        // DCRPCclient.Logger = new ConsoleLogger { Level = LogLevel.Warning };
+        // DCRPCclient.Initialize();
 
         var handle = new WindowInteropHelper(this).Handle;
         Bass.BASS_Init(-1, 44100, BASSInit.BASS_DEVICE_CPSPEAKERS, handle);
