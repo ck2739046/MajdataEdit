@@ -41,6 +41,8 @@ public partial class MainWindow : Window
     public static readonly SemVersion MAJDATA_VERSION = SemVersion.Parse(MAJDATA_VERSION_STRING, SemVersionStyles.Any);
 
     public static string maidataDir = "";
+    public static string currentTrackFilename = "";
+    private ControlFileWatcher? _controlFileWatcher;
 
     //float[] wavedBs;
     private readonly short[][] waveRaws = new short[3][];
@@ -240,15 +242,34 @@ public partial class MainWindow : Window
     }
 
     //*FILE CONTROL
-    private void initFromFile(string path) //file name should not be included in path
+    public void initFromFile(string path, string? maidataFilename = null, string? trackFilename = null) //file name should not be included in path
     {
         if (soundSetting != null) soundSetting.Close();
         if (editorSetting == null) ReadEditorSetting();
 
-        var useOgg = File.Exists(path + "/track.ogg");
+        // Use provided filenames or fall back to defaults
+        var actualMaidataFilename = maidataFilename ?? "maidata.txt";
 
-        var audioPath = path + "/track" + (useOgg ? ".ogg" : ".mp3");
-        var dataPath = path + "/maidata.txt";
+        bool useOgg;
+        if (trackFilename != null)
+        {
+            useOgg = string.Equals(
+                Path.GetFileNameWithoutExtension(trackFilename),
+                "ogg",
+                StringComparison.OrdinalIgnoreCase
+            );
+            currentTrackFilename = trackFilename;
+        }
+        else
+        {
+            useOgg = File.Exists(path + "/" + "track.ogg");
+            currentTrackFilename = "track" + (useOgg ? ".ogg" : ".mp3");
+        }
+
+        var audioPath = path + "/" + currentTrackFilename;
+        var dataPath = path + "/" + actualMaidataFilename;
+
+        Console.WriteLine("Loading from " + dataPath + " and " + audioPath);
         if (!File.Exists(audioPath))
         {
             MessageBox.Show(GetLocalizedString("NoTrack"), GetLocalizedString("Error"));
@@ -326,8 +347,7 @@ public partial class MainWindow : Window
 
     private void ReadWaveFromFile()
     {
-        var useOgg = File.Exists(maidataDir + "/track.ogg");
-        var bgmDecode = Bass.BASS_StreamCreateFile(maidataDir + "/track" + (useOgg ? ".ogg" : ".mp3"), 0L, 0L, BASSFlag.BASS_STREAM_DECODE);
+        var bgmDecode = Bass.BASS_StreamCreateFile(maidataDir + "/" + currentTrackFilename, 0L, 0L, BASSFlag.BASS_STREAM_DECODE);
         try
         {
             songLength = Bass.BASS_ChannelBytes2Seconds(bgmDecode,
@@ -339,7 +359,7 @@ public partial class MainWindow : Window
                     wavedBs[i] = Bass.BASS_ChannelGetLevels(bgmDecode, 0.02f, BASSLevel.BASS_LEVEL_MONO)[0];
                 }*/
             Bass.BASS_StreamFree(bgmDecode);
-            var bgmSample = Bass.BASS_SampleLoad(maidataDir + "/track" + (useOgg ? ".ogg" : ".mp3"), 0, 0, 1, BASSFlag.BASS_DEFAULT);
+            var bgmSample = Bass.BASS_SampleLoad(maidataDir + "/" + currentTrackFilename, 0, 0, 1, BASSFlag.BASS_DEFAULT);
             var bgmInfo = Bass.BASS_SampleGetInfo(bgmSample);
             var freq = bgmInfo.freq;
             var sampleCount = (long)(songLength * freq * 2);
