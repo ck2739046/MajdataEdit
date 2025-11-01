@@ -114,9 +114,47 @@ namespace MajdataEdit
                 // Read all lines from the control file
                 string[] lines = File.ReadAllLines(_controlFilePath);
                 
+                // Check for exit command (single line with "exit")
+                if (lines.Length == 1 && lines[0].Trim().ToLower() == "exit")
+                {
+                    Console.WriteLine($"[ControlFileWatcher] Received exit command");
+                    
+                    // Delete the control file to prevent repeated processing
+                    try
+                    {
+                        File.Delete(_controlFilePath);
+                        Console.WriteLine($"[ControlFileWatcher] Control file deleted: {_controlFilePath}");
+                    }
+                    catch (Exception deleteEx)
+                    {
+                        Console.WriteLine($"[ControlFileWatcher] Warning: Could not delete control file: {deleteEx.Message}");
+                    }
+
+                    // Use dispatcher to close the application on the UI thread
+                    _mainWindow.Dispatcher.BeginInvoke(() =>
+                    {
+                        try
+                        {
+                            Console.WriteLine($"[ControlFileWatcher] Closing MajdataEdit...");
+                            _mainWindow.Close();
+                            Console.WriteLine($"[ControlFileWatcher] MajdataEdit close requested");
+                        }
+                        catch (Exception closeEx)
+                        {
+                            Console.WriteLine($"[ControlFileWatcher] Error closing MajdataEdit: {closeEx.Message}");
+                        }
+                        finally
+                        {
+                            _isProcessing = false;
+                        }
+                    }, DispatcherPriority.Normal);
+                    
+                    return;
+                }
+                
                 if (lines.Length < 3)
                 {
-                    Console.WriteLine($"[ControlFileWatcher] Invalid control file format: expected 3 lines, got {lines.Length}");
+                    Console.WriteLine($"[ControlFileWatcher] Invalid control file format: expected 3 lines or single 'exit' command, got {lines.Length}");
                     _isProcessing = false;
                     return;
                 }
