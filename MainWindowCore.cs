@@ -647,7 +647,7 @@ public partial class MainWindow : Window
         // 经过实测，ActualWidth+16才与Width相等 (1920x1080, windows缩放100%)
         var new_width = TopMenu.ActualWidth > 10 ? (int)TopMenu.ActualWidth + 16 - 2 : (int)Width - 2;
         var height = (int)MusicWave.Height;
-        Console.WriteLine($"InitWave - Window.Width: {Width}, TopMenu.ActualWidth: {TopMenu.ActualWidth}, Using width: {new_width}");
+        Console.WriteLine($"InitWave - Window.Width: {Width}, TopMenu.ActualWidth: {TopMenu.ActualWidth}, Using width: {new_width}, embed_mode: {MainWindow.embed_mode}");
         WaveBitmap = new WriteableBitmap(new_width, height, 72, 72, PixelFormats.Pbgra32, null);
         MusicWave.Source = WaveBitmap;
     }

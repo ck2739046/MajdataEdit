@@ -28,10 +28,17 @@ public partial class MainWindow : Window
     
     [DllImport("kernel32.dll")]
     static extern bool FreeConsole();
+    
+    public static bool embed_mode = false;
+    
     public MainWindow()
     {
-        // 分配控制台用于调试输出
-        AllocConsole();
+        // 只在非 embed_mode 时分配控制台
+        embed_mode = Environment.GetCommandLineArgs().Contains("--embed_mode");
+        if (!embed_mode)
+        {
+            AllocConsole();
+        }
         
         InitializeComponent();
         if (Environment.GetCommandLineArgs().Contains("--ForceSoftwareRender"))
@@ -167,12 +174,16 @@ public partial class MainWindow : Window
 
         // 正常退出
         SafeTerminationDetector.Of().RecordProgramClose();
-        
+
         // Stop the control file watcher
         _controlFileWatcher?.Dispose();
         
-        // 释放控制台
-        FreeConsole();
+        // 只在非 embed_mode 时释放控制台
+        embed_mode = Environment.GetCommandLineArgs().Contains("--embed_mode");
+        if (!embed_mode)
+        {
+            FreeConsole();
+        }
     }
 
     //Window grid events
