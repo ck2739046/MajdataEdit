@@ -1135,6 +1135,11 @@ public partial class MainWindow : Window
     {
         if (lastEditorState == EditorControlMethod.Pause) sendRequestStop();
         Bass.BASS_ChannelSetPosition(bgmStream, time);
+
+        // Broadcast position to App in embed mode
+        var payload = new { control = 273, position = time };
+        var json = JsonConvert.SerializeObject(payload);
+        BroadcastToApp(json);
     }
 
 
