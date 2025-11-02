@@ -1196,7 +1196,8 @@ public partial class MainWindow : Window
     {
         var requestStop = new EditRequestjson
         {
-            control = EditorControlMethod.Pause
+            control = EditorControlMethod.Pause,
+            startTime = (float)Bass.BASS_ChannelBytes2Seconds(bgmStream, Bass.BASS_ChannelGetPosition(bgmStream)),
         };
         var json = JsonConvert.SerializeObject(requestStop);
         
