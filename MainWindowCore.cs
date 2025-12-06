@@ -42,6 +42,7 @@ public partial class MainWindow : Window
 
     public static string maidataDir = "";
     public static string currentTrackFilename = "";
+    public static string? currentMovieFilename = null;
     private ControlFileWatcher? _controlFileWatcher;
 
     //float[] wavedBs;
@@ -242,7 +243,7 @@ public partial class MainWindow : Window
     }
 
     //*FILE CONTROL
-    public void initFromFile(string path, string? maidataFilename = null, string? trackFilename = null) //file name should not be included in path
+    public void initFromFile(string path, string? maidataFilename = null, string? trackFilename = null, string? movieFilename = null) //file name should not be included in path
     {
         if (soundSetting != null) soundSetting.Close();
         if (editorSetting == null) ReadEditorSetting();
@@ -265,6 +266,8 @@ public partial class MainWindow : Window
             useOgg = File.Exists(path + "/" + "track.ogg");
             currentTrackFilename = "track" + (useOgg ? ".ogg" : ".mp3");
         }
+
+        currentMovieFilename = movieFilename;
 
         var audioPath = path + "/" + currentTrackFilename;
         var dataPath = path + "/" + actualMaidataFilename;
@@ -1282,6 +1285,7 @@ public partial class MainWindow : Window
             request.comboStatusType = editorSetting!.comboStatusType;
             request.audioSpeed = GetPlaybackSpeed();
             request.smoothSlideAnime = editorSetting!.SmoothSlideAnime;
+            request.moviePath = currentMovieFilename != null ? Path.Combine(maidataDir, currentMovieFilename) : null;
         });
 
         json = JsonConvert.SerializeObject(request);

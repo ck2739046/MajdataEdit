@@ -154,7 +154,7 @@ namespace MajdataEdit
                 
                 if (lines.Length < 3)
                 {
-                    Console.WriteLine($"[ControlFileWatcher] Invalid control file format: expected 3 lines or single 'exit' command, got {lines.Length}");
+                    Console.WriteLine($"[ControlFileWatcher] Invalid control file format: expected 3 or 4 lines or single 'exit' command, got {lines.Length}");
                     _isProcessing = false;
                     return;
                 }
@@ -180,11 +180,30 @@ namespace MajdataEdit
                 string folderPath = folderLine.Substring("folder: ".Length).Trim();
                 string maidataFilename = maidataLine.Substring("maidata: ".Length).Trim();
                 string trackFilename = trackLine.Substring("track: ".Length).Trim();
+                string? movieFilename = null;
+                
+                // Parse optional movie line
+                if (lines.Length >= 4)
+                {
+                    string movieLine = lines[3].Trim();
+                    if (movieLine.StartsWith("movie: "))
+                    {
+                        movieFilename = movieLine.Substring("movie: ".Length).Trim();
+                    }
+                    else
+                    {
+                        Console.WriteLine($"[ControlFileWatcher] Warning: Fourth line does not start with 'movie: ', ignoring");
+                    }
+                }
 
                 Console.WriteLine($"[ControlFileWatcher] Parsed control file:");
                 Console.WriteLine($"  Folder: {folderPath}");
                 Console.WriteLine($"  Maidata: {maidataFilename}");
                 Console.WriteLine($"  Track: {trackFilename}");
+                if (movieFilename != null)
+                {
+                    Console.WriteLine($"  Movie: {movieFilename}");
+                }
 
                 // Validate folder exists
                 if (!Directory.Exists(folderPath))
@@ -213,7 +232,7 @@ namespace MajdataEdit
                 {
                     try
                     {
-                        _mainWindow.initFromFile(folderPath, maidataFilename, trackFilename);
+                        _mainWindow.initFromFile(folderPath, maidataFilename, trackFilename, movieFilename);
                         Console.WriteLine($"[ControlFileWatcher] Successfully loaded data from {folderPath}");
                     }
                     catch (Exception loadEx)
