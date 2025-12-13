@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Threading;
+using System.Windows;
 using System.Windows.Threading;
 
 namespace MajdataEdit
@@ -232,6 +233,21 @@ namespace MajdataEdit
                 {
                     try
                     {
+                        // Check if there are unsaved changes
+                        if (!_mainWindow.IsSaved)
+                        {
+                            var result = MessageBox.Show(
+                                MainWindow.GetLocalizedString("AskSave"),
+                                MainWindow.GetLocalizedString("Warning"),
+                                MessageBoxButton.YesNo);
+                            
+                            if (result == MessageBoxResult.Yes)
+                            {
+                                _mainWindow.SaveFumen(true);
+                            }
+                            // If result is No, continue without saving
+                        }
+                        
                         _mainWindow.initFromFile(folderPath, maidataFilename, trackFilename, movieFilename);
                         Console.WriteLine($"[ControlFileWatcher] Successfully loaded data from {folderPath}");
                     }

@@ -62,6 +62,7 @@ public partial class MainWindow : Window
     private bool isReplaceConformed;
 
     private bool isSaved = true;
+    public bool IsSaved => isSaved;
     private EditorControlMethod lastEditorState;
     private TextSelection? lastFindPosition;
 
@@ -419,7 +420,7 @@ public partial class MainWindow : Window
         return true;
     }
 
-    private void SaveFumen(bool writeToDisk = false)
+    public void SaveFumen(bool writeToDisk = false)
     {
         if (selectedDifficulty == -1) return;
         SimaiProcess.fumens[selectedDifficulty] = GetRawFumenText();
