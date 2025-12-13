@@ -323,7 +323,7 @@ public partial class MainWindow : Window
         Bass.BASS_ChannelSetAttribute(holdRiserStream, BASSAttribute.BASS_ATTRIB_VOL,
             editorSetting!.Default_Hanabi_Level);
         var info = Bass.BASS_ChannelGetInfo(bgmStream);
-        if (info.freq != 44100) MessageBox.Show(GetLocalizedString("Warn44100Hz"), GetLocalizedString("Attention"));
+        if (info.freq != 44100 && info.freq != 48000) MessageBox.Show(GetLocalizedString("Warn44100Hz"), GetLocalizedString("Attention"));
         ReadWaveFromFile();
         SimaiProcess.ClearData();
 
