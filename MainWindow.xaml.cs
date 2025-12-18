@@ -661,4 +661,32 @@ public partial class MainWindow : Window
     }
 
     #endregion
+
+    #region 速度控制按钮事件处理
+
+    private void DecreaseSpeedButton_Click(object sender, RoutedEventArgs e)
+    {
+        // 直接调用减速命令，模拟按下Ctrl+o快捷键
+        DecreasePlaybackSpeed_CanExecute(this, null);
+    }
+
+    private void IncreaseSpeedButton_Click(object sender, RoutedEventArgs e)
+    {
+        // 直接调用加速命令，模拟按下Ctrl+p快捷键
+        IncreasePlaybackSpeed_CanExecute(this, null);
+    }
+
+    private void JumpToStartButton_Click(object sender, RoutedEventArgs e)
+    {
+        // 如果正在播放，则不执行跳转操作
+        if (Bass.BASS_ChannelIsActive(bgmStream) == BASSActive.BASS_ACTIVE_PLAYING) return;
+
+        ToggleStop(); // 通过stop清空majdataview
+        SetBgmPosition(0); // 将BGM位置设置为0
+        SimaiProcess.ClearNoteListPlayedState(); // 清除已播放状态
+        DrawWave(); // 强制重绘波形图
+        FumenContent.Focus(); // 返回焦点
+    }
+
+    #endregion
 }
