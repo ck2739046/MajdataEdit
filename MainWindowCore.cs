@@ -1201,12 +1201,9 @@ public partial class MainWindow : Window
         var requestStop = new EditRequestjson
         {
             control = EditorControlMethod.Pause,
-            startTime = (float)Bass.BASS_ChannelBytes2Seconds(bgmStream, Bass.BASS_ChannelGetPosition(bgmStream)),
+            appPort = embed_mode ? 8014 : -1 // 将app端口告诉majdataview
         };
         var json = JsonConvert.SerializeObject(requestStop);
-        
-        // Broadcast to App in embed mode
-        BroadcastToApp(json);
         
         var response = WebControl.RequestPOST("http://localhost:8013/", json);
         if (response == "ERROR")
