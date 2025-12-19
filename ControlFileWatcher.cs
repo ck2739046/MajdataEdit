@@ -206,6 +206,43 @@ namespace MajdataEdit
                     Console.WriteLine($"  Movie: {movieFilename}");
                 }
 
+                // Check if all three values are "---"
+                if (folderPath == "---" && maidataFilename == "---" && trackFilename == "---")
+                {
+                    Console.WriteLine($"[ControlFileWatcher] Received stop command (all fields are '---')");
+                    
+                    // Delete the control file to prevent repeated processing
+                    try
+                    {
+                        File.Delete(_controlFilePath);
+                        Console.WriteLine($"[ControlFileWatcher] Control file deleted: {_controlFilePath}");
+                    }
+                    catch (Exception deleteEx)
+                    {
+                        Console.WriteLine($"[ControlFileWatcher] Warning: Could not delete control file: {deleteEx.Message}");
+                    }
+
+                    // Use dispatcher to call the main window methods on the UI thread
+                    _mainWindow.Dispatcher.BeginInvoke(() =>
+                    {
+                        try
+                        {
+                            if (_mainWindow.isPlaying)
+                            {
+                                _mainWindow.TogglePause();
+                                Console.WriteLine($"[ControlFileWatcher] MajdataEdit paused");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"[ControlFileWatcher] Error when pausing: {ex.Message}");
+                        }
+                    }, DispatcherPriority.Normal);
+                    
+                    _isProcessing = false;
+                    return;
+                }
+
                 // Validate folder exists
                 if (!Directory.Exists(folderPath))
                 {

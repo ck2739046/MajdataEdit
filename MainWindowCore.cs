@@ -1071,7 +1071,7 @@ public partial class MainWindow : Window
         DrawWave();
     }
 
-    private void TogglePause()
+    public void TogglePause()
     {
         Op_Button.IsEnabled = true;
         isPlaying = false;

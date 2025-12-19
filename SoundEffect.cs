@@ -25,7 +25,7 @@ public partial class MainWindow
     public int holdRiserStream = -114514;
     private bool isPlan2Stop; // 已准备停止 当all perfect无法在播放完BGM前结束时需要此功能
 
-    private bool isPlaying; // 为了解决播放到结束时自动停止
+    internal bool isPlaying; // 为了解决播放到结束时自动停止
     public int judgeBreakSlideStream = -114514; // break-slide判定音效
     public int judgeBreakStream = -114514; // 这个是break的判定音效 不是欢呼声
     public int judgeExStream = -114514;
