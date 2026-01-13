@@ -8,17 +8,18 @@ namespace MajdataEdit
 {
     public class ControlFileWatcher : IDisposable
     {
-        private readonly string _controlFileName = "HachimiDX-Convert-Majdata-Control.txt";
+        private readonly string _controlFileName;
         private readonly string _controlFilePath;
         private FileSystemWatcher? _watcher;
         private readonly MainWindow _mainWindow;
         private readonly DispatcherTimer _processingTimer;
         private bool _isProcessing = false;
 
-        public ControlFileWatcher(MainWindow mainWindow)
+        public ControlFileWatcher(MainWindow mainWindow, string controlFilePath)
         {
             _mainWindow = mainWindow;
-            _controlFilePath = Path.Combine(Environment.CurrentDirectory, _controlFileName);
+            _controlFilePath = controlFilePath;
+            _controlFileName = Path.GetFileName(controlFilePath);
             
             Console.WriteLine($"[ControlFileWatcher] Initialized with control file path: {_controlFilePath}");
             
@@ -34,8 +35,15 @@ namespace MajdataEdit
         {
             try
             {
-                // Create watcher for the current directory
-                _watcher = new FileSystemWatcher(Environment.CurrentDirectory)
+                // Create watcher for the directory containing the control file
+                string? directory = Path.GetDirectoryName(_controlFilePath);
+                if (directory == null)
+                {
+                    Console.WriteLine($"[ControlFileWatcher] Error: Could not get directory from path: {_controlFilePath}");
+                    return;
+                }
+                
+                _watcher = new FileSystemWatcher(directory)
                 {
                     Filter = _controlFileName,
                     NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite | NotifyFilters.CreationTime,

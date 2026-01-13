@@ -30,18 +30,31 @@ public partial class MainWindow : Window
     static extern bool FreeConsole();
     
     public static bool embed_mode = false;
+    public static string? controlFilePath = null;
     
     public MainWindow()
     {
+        // 解析命令行参数
+        var args = Environment.GetCommandLineArgs();
+        
+        // 检查 embed_mode
+        embed_mode = args.Contains("--embed_mode");
+
         // 只在非 embed_mode 时分配控制台
-        embed_mode = Environment.GetCommandLineArgs().Contains("--embed_mode");
-        if (!embed_mode)
+        if (!embed_mode) AllocConsole();
+        
+        // 解析 control-file 参数
+        for (int i = 1; i < args.Length; i++)
         {
-            AllocConsole();
+            if (args[i].ToLower().Contains("control"))
+            {
+                controlFilePath = args[i];
+                break;
+            }
         }
         
         InitializeComponent();
-        if (Environment.GetCommandLineArgs().Contains("--ForceSoftwareRender"))
+        if (args.Contains("--ForceSoftwareRender"))
         {
             MessageBox.Show("正在以软件渲染模式运行\nソフトウェア・レンダリング・モードで動作\nBooting as software rendering mode.");
             RenderOptions.ProcessRenderMode = RenderMode.SoftwareOnly;
@@ -75,9 +88,12 @@ public partial class MainWindow : Window
         waveStopMonitorTimer.Elapsed += WaveStopMonitorTimer_Elapsed;
         playbackSpeedHideTimer.Elapsed += PlbHideTimer_Elapsed;
 
-        // Initialize and start the control file watcher
-        _controlFileWatcher = new ControlFileWatcher(this);
-        _controlFileWatcher.StartWatching();
+        // Initialize and start the control file watcher if control file path is provided
+        if (controlFilePath != null)
+        {
+            _controlFileWatcher = new ControlFileWatcher(this, controlFilePath);
+            _controlFileWatcher.StartWatching();
+        }
 
         if (editorSetting!.AutoCheckUpdate) CheckUpdate(true);
 
