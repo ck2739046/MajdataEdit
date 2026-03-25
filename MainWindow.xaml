@@ -94,6 +94,7 @@
         <CheckBox x:Name="FollowPlayCheck" Content="{lex:Loc TextFollow}" HorizontalAlignment="Left" Height="21"
                   Margin="9,0,0,129" VerticalAlignment="Bottom" Width="87"
                   Foreground="{DynamicResource ButtonForeground}" HorizontalContentAlignment="Right"
+                  IsChecked="True"
                   Click="FollowPlayCheck_Click" Background="{DynamicResource ButtonsBackground}"
                   Template="{DynamicResource DarkCheck}" />
         <RichTextBox x:Name="FumenContent"
