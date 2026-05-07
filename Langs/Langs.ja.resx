@@ -132,6 +132,9 @@
   <data name="Brightness" xml:space="preserve">
     <value>明るさ</value>
   </data>
+  <data name="CloseChart" xml:space="preserve">
+    <value>譜面を閉じる</value>
+  </data>
   <data name="Difficulty" xml:space="preserve">
     <value>レベル</value>
   </data>

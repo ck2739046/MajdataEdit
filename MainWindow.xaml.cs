@@ -277,6 +277,12 @@ public partial class MainWindow : Window
     {
     }
 
+    private void Menu_CloseChart_Click(object sender, RoutedEventArgs e)
+    {
+        if (!isSaved) if (!AskSave()) return;
+        ClearWindow(true);
+    }
+
     private void Menu_ExportRender_Click(object sender, RoutedEventArgs e)
     {
         TogglePlayAndPause(PlayMethod.Record);
@@ -513,6 +519,7 @@ public partial class MainWindow : Window
     private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         var i = LevelSelector.SelectedIndex;
+        if (i < 0 || i >= SimaiProcess.fumens.Length) return;
         SetRawFumenText(SimaiProcess.fumens[i]);
         selectedDifficulty = i;
         LevelTextBox.Text = SimaiProcess.levels[selectedDifficulty];

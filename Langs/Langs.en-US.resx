@@ -132,6 +132,9 @@
   <data name="Brightness" xml:space="preserve">
     <value>Bright</value>
   </data>
+  <data name="CloseChart" xml:space="preserve">
+    <value>Close Chart</value>
+  </data>
   <data name="Difficulty" xml:space="preserve">
     <value>Level</value>
   </data>

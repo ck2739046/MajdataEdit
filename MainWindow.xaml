@@ -39,6 +39,7 @@
                 <MenuItem x:Name="Menu_Save" Header="{lex:Loc Save}" Click="Menu_Save_Click" />
                 <MenuItem x:Name="Menu_SaveAs" Header="{lex:Loc SaveAs}" Click="Menu_SaveAs_Click" IsEnabled="False"
                           Visibility="Collapsed" />
+                <MenuItem x:Name="Menu_CloseChart" Header="{lex:Loc CloseChart}" Click="Menu_CloseChart_Click" />
                 <Separator />
                 <MenuItem x:Name="Menu_AutosaveRecover" Header="{lex:Loc AutosaveRecoverWindowTitle}"
                           Click="Menu_AutosaveRecover_Click" />

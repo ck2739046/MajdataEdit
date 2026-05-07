@@ -385,6 +385,61 @@ public partial class MainWindow : Window
         }
     }
 
+    /// <summary>
+    ///     Clear all chart-related data and optionally reset UI to empty state.
+    ///     Does NOT check if file is saved. Always call AskSave() before this if needed.
+    /// </summary>
+    /// <param name="setEmpty">Whether to reset UI elements to empty state</param>
+    public void ClearWindow(bool setEmpty = false)
+    {
+        ToggleStop();
+
+        SaveSetting();
+
+        // clear data
+        soundSetting?.Close();
+        FumenContent.Document.Blocks.Clear();
+        SimaiProcess.ClearData();
+        LevelSelector.SelectedIndex = -1;
+        // suppress SelectionChanged from firing during clear
+        selectedDifficulty = -1;
+        OffsetTextBox.Text = "";
+
+        // about save
+        AutoSaveManager.Of().SetAutoSaveEnable(false);
+        SetSavedState(true);
+
+        if (setEmpty) set_empty();
+    }
+
+    /// <summary>
+    ///     Reset window UI to empty/idle state.
+    ///     Only configures program-logic-unrelated UI elements like availability and title bar text.
+    /// </summary>
+    public void set_empty()
+    {
+        isLoading = false;
+
+        // show cover
+        Cover.Visibility = Visibility.Visible;
+
+        // ready for play
+        Op_Button.IsEnabled = true;
+        PlayAndPauseButton.Content = "▶";
+
+        // limit for menu
+        MenuEdit.IsEnabled = false;
+        VolumnSetting.IsEnabled = false;
+        Menu_ExportRender.IsEnabled = false;
+        MenuMuriCheck.IsEnabled = false;
+
+        // window title
+        TheWindow.Title = GetWindowsTitleString();
+
+        // focus
+        Cover.Focus();
+    }
+
     private void SetSavedState(bool state)
     {
         if (state)
