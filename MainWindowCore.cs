@@ -1316,6 +1316,9 @@ public partial class MainWindow : Window
 
     private bool CheckAndStartView()
     {
+        // 在 embed_mode 不启动 MajdataView
+        if (MainWindow.embed_mode) return false;
+
         if (Process.GetProcessesByName("MajdataView").Length == 0 && Process.GetProcessesByName("Unity").Length == 0)
         {
             var viewProcess = Process.Start("MajdataView.exe");
