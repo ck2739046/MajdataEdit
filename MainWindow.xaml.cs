@@ -13,6 +13,7 @@ using System.Windows.Media;
 using DiscordRPC.Logging;
 using MajdataEdit.AutoSaveModule;
 using Microsoft.Win32;
+using Newtonsoft.Json;
 using Un4seen.Bass;
 using Timer = System.Timers.Timer;
 
@@ -281,6 +282,14 @@ public partial class MainWindow : Window
     {
         if (!isSaved) if (!AskSave()) return;
         ClearWindow(true);
+
+        // Broadcast to App in embed mode
+        if (embed_mode)
+        {
+            var payload = new { control = 274 };
+            var json = JsonConvert.SerializeObject(payload);
+            BroadcastToApp(json);
+        }
     }
 
     private void Menu_ExportRender_Click(object sender, RoutedEventArgs e)
