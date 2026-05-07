@@ -330,9 +330,11 @@ public partial class MainWindow : Window
         if (!SimaiProcess.ReadData(dataPath)) return;
 
 
-        LevelSelector.SelectedItem = LevelSelector.Items[0];
+        if (LevelSelector.Items.Count > 0)
+            LevelSelector.SelectedItem = LevelSelector.Items[0];
         ReadSetting();
-        SetRawFumenText(SimaiProcess.fumens[selectedDifficulty]);
+        if (selectedDifficulty >= 0 && selectedDifficulty < SimaiProcess.fumens.Length)
+            SetRawFumenText(SimaiProcess.fumens[selectedDifficulty]);
         SeekTextFromTime();
         SimaiProcess.Serialize(GetRawFumenText());
         FumenContent.Focus();
@@ -525,8 +527,12 @@ public partial class MainWindow : Window
         var path = maidataDir + "/" + majSettingFilename;
         if (!File.Exists(path)) return;
         var setting = JsonConvert.DeserializeObject<MajSetting>(File.ReadAllText(path));
-        LevelSelector.SelectedIndex = setting!.lastEditDiff;
-        selectedDifficulty = setting.lastEditDiff;
+        var diff = setting!.lastEditDiff;
+        if (diff >= 0 && diff < LevelSelector.Items.Count)
+        {
+            LevelSelector.SelectedIndex = diff;
+            selectedDifficulty = diff;
+        }
         SetBgmPosition(setting.lastEditTime);
         Bass.BASS_ChannelSetAttribute(bgmStream, BASSAttribute.BASS_ATTRIB_VOL, setting.BGM_Level);
         Bass.BASS_ChannelSetAttribute(trackStartStream, BASSAttribute.BASS_ATTRIB_VOL, setting.BGM_Level);
