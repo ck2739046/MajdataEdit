@@ -430,12 +430,12 @@ public partial class MainWindow : Window
 
     private void PlayAndPause_CanExecute(object? sender, CanExecuteRoutedEventArgs e) //快捷键
     {
-        TogglePlayAndStop();
+        TogglePlayAndPause();
     }
 
     private void StopPlaying_CanExecute(object? sender, CanExecuteRoutedEventArgs e) //快捷键
     {
-        TogglePlayAndPause();
+        TogglePlayAndStop();
     }
 
     private void SaveFile_Command_CanExecute(object? sender, CanExecuteRoutedEventArgs e)
