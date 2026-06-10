@@ -105,7 +105,7 @@ public class EditorSetting
     public string PlayStopKey = "Ctrl+Shift+x";
     public int RenderMode = 0; //0=硬件渲染(默认)，1=软件渲染
     public string SaveKey = "Ctrl+s";
-    public string SendViewerKey = "Ctrl+Shift+z";
+    public string SendViewerKey = "Ctrl+Shift+a";
     public float touchSpeed = 7.5f;
     public bool SmoothSlideAnime = false;
 }
