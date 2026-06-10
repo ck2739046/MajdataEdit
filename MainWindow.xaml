@@ -4,6 +4,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
+    xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
     lex:LocalizeDictionary.DesignCulture="zh-CN"
     lex:ResxLocalizationProvider.DefaultAssembly="MajdataEdit"
     lex:ResxLocalizationProvider.DefaultDictionary="Langs"
@@ -11,6 +12,36 @@
     mc:Ignorable="d"
     Title="MajdataEdit" Height="542" Width="720.5" Loaded="Window_Loaded" Closing="Window_Closing" SizeChanged="Window_SizeChanged" MinHeight="517"
     WindowStartupLocation="CenterScreen">
+
+    <Window.Resources>
+        <RoutedUICommand x:Key="PlayAndPause" Text="PlayAndPause" />
+        <RoutedUICommand x:Key="SaveFile" Text="SaveFile" />
+        <RoutedUICommand x:Key="StopPlaying" Text="StopPlaying" />
+        <RoutedUICommand x:Key="SendToView" Text="SendToView" />
+        <RoutedUICommand x:Key="IncreasePlaybackSpeed" Text="IncreasePlaybackSpeed" />
+        <RoutedUICommand x:Key="DecreasePlaybackSpeed" Text="DecreasePlaybackSpeed" />
+        <RoutedUICommand x:Key="Find" Text="Find" />
+        <RoutedUICommand x:Key="MirrorLR" Text="MirrorLR" />
+        <RoutedUICommand x:Key="MirrorUD" Text="MirrorUD" />
+        <RoutedUICommand x:Key="Mirror180" Text="Mirror180" />
+        <RoutedUICommand x:Key="Mirror45" Text="Mirror45" />
+        <RoutedUICommand x:Key="MirrorCcw45" Text="MirrorCcw45" />
+    </Window.Resources>
+
+    <Window.CommandBindings>
+        <CommandBinding Command="{StaticResource PlayAndPause}" CanExecute="PlayAndPause_CanExecute" />
+        <CommandBinding Command="{StaticResource SaveFile}" CanExecute="SaveFile_Command_CanExecute" />
+        <CommandBinding Command="{StaticResource StopPlaying}" CanExecute="StopPlaying_CanExecute" />
+        <CommandBinding Command="{StaticResource SendToView}" CanExecute="SendToView_CanExecute" />
+        <CommandBinding Command="{StaticResource IncreasePlaybackSpeed}" CanExecute="IncreasePlaybackSpeed_CanExecute" />
+        <CommandBinding Command="{StaticResource DecreasePlaybackSpeed}" CanExecute="DecreasePlaybackSpeed_CanExecute" />
+        <CommandBinding Command="{StaticResource Find}" CanExecute="FindCommand_CanExecute" />
+        <CommandBinding Command="{StaticResource MirrorLR}" CanExecute="MirrorLRCommand_CanExecute" />
+        <CommandBinding Command="{StaticResource MirrorUD}" CanExecute="MirrorUDCommand_CanExecute" />
+        <CommandBinding Command="{StaticResource Mirror180}" CanExecute="Mirror180Command_CanExecute" />
+        <CommandBinding Command="{StaticResource Mirror45}" CanExecute="Mirror45Command_CanExecute" />
+        <CommandBinding Command="{StaticResource MirrorCcw45}" CanExecute="MirrorCcw45Command_CanExecute" />
+    </Window.CommandBindings>
 
     <Grid Margin="0" DragEnter="Grid_DragEnter" AllowDrop="True" Drop="Grid_Drop">
         <Grid.Background>
@@ -98,52 +129,17 @@
                   IsChecked="True"
                   Click="FollowPlayCheck_Click" Background="{DynamicResource ButtonsBackground}"
                   Template="{DynamicResource DarkCheck}" />
-        <RichTextBox x:Name="FumenContent"
+        <avalonEdit:TextEditor x:Name="FumenContent"
                      Padding="0,5" FontFamily="Consolas"
-                     Foreground="#FFE8E8E8" TextChanged="FumenContent_TextChanged"
+                     Foreground="#FFE8E8E8"
                      Margin="105,30,10,91" HorizontalScrollBarVisibility="Auto"
                      VerticalScrollBarVisibility="Visible"
-                     SelectionChanged="FumenContent_SelectionChanged" Grid.ColumnSpan="2"
-                     InputMethod.IsInputMethodEnabled="False"
-                     AutoWordSelection="False"
+                     Grid.ColumnSpan="2"
                      PreviewKeyDown="FumenContent_OnPreviewKeyDown">
-            <RichTextBox.Resources>
-                <RoutedUICommand x:Key="PlayAndPause" Text="PlayAndPause" />
-                <RoutedUICommand x:Key="SaveFile" Text="SaveFile" />
-                <RoutedUICommand x:Key="StopPlaying" Text="StopPlaying" />
-                <RoutedUICommand x:Key="SendToView" Text="SendToView" />
-                <RoutedUICommand x:Key="IncreasePlaybackSpeed" Text="IncreasePlaybackSpeed" />
-                <RoutedUICommand x:Key="DecreasePlaybackSpeed" Text="DecreasePlaybackSpeed" />
-                <RoutedUICommand x:Key="Find" Text="Find" />
-                <RoutedUICommand x:Key="MirrorLR" Text="MirrorLR" />
-                <RoutedUICommand x:Key="MirrorUD" Text="MirrorUD" />
-                <RoutedUICommand x:Key="Mirror180" Text="Mirror180" />
-                <RoutedUICommand x:Key="Mirror45" Text="Mirror45" />
-                <RoutedUICommand x:Key="MirrorCcw45" Text="MirrorCcw45" />
-            </RichTextBox.Resources>
-            <RichTextBox.Background>
+            <avalonEdit:TextEditor.Background>
                 <SolidColorBrush Color="#FF171717" Opacity="0.3" />
-            </RichTextBox.Background>
-            <!--Bindings are dynamicly added via ReadEditorSetting()-->
-            <RichTextBox.CommandBindings>
-                <CommandBinding Command="{StaticResource PlayAndPause}" CanExecute="PlayAndPause_CanExecute" />
-                <CommandBinding Command="{StaticResource SaveFile}" CanExecute="SaveFile_Command_CanExecute" />
-                <CommandBinding Command="{StaticResource StopPlaying}" CanExecute="StopPlaying_CanExecute" />
-                <CommandBinding Command="{StaticResource SendToView}" CanExecute="SendToView_CanExecute" />
-                <CommandBinding Command="{StaticResource IncreasePlaybackSpeed}"
-                                CanExecute="IncreasePlaybackSpeed_CanExecute" />
-                <CommandBinding Command="{StaticResource DecreasePlaybackSpeed}"
-                                CanExecute="DecreasePlaybackSpeed_CanExecute" />
-                <CommandBinding Command="{StaticResource Find}" CanExecute="FindCommand_CanExecute" />
-                <CommandBinding Command="{StaticResource MirrorLR}" CanExecute="MirrorLRCommand_CanExecute" />
-                <CommandBinding Command="{StaticResource MirrorUD}" CanExecute="MirrorUDCommand_CanExecute" />
-                <CommandBinding Command="{StaticResource Mirror180}" CanExecute="Mirror180Command_CanExecute" />
-                <CommandBinding Command="{StaticResource Mirror45}" CanExecute="Mirror45Command_CanExecute" />
-                <CommandBinding Command="{StaticResource MirrorCcw45}" CanExecute="MirrorCcw45Command_CanExecute" />
-
-            </RichTextBox.CommandBindings>
-            <FlowDocument />
-        </RichTextBox>
+            </avalonEdit:TextEditor.Background>
+        </avalonEdit:TextEditor>
         <Label x:Name="TimeLabel" Content="0:00" HorizontalAlignment="Left" Height="64" Margin="0,17,0,0"
                VerticalAlignment="Top" Width="105" Foreground="White" FontFamily="Bahnschrift Light" FontSize="50"
                VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />

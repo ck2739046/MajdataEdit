@@ -81,6 +81,12 @@ public partial class MainWindow : Window
         ReadSoundEffect();
         ReadEditorSetting();
 
+        // 注册 Simai 语法高亮着色器（AvalonEdit 渲染层着色，不影响文字模型）
+        FumenContent.TextArea.TextView.LineTransformers.Add(new SimaiColorizer());
+        // 钩子 AvalonEdit 事件
+        FumenContent.TextArea.Caret.PositionChanged += FumenContent_SelectionChanged;
+        FumenContent.Document.TextChanged += FumenContent_TextChanged;
+
         chartChangeTimer.Elapsed += ChartChangeTimer_Elapsed;
         chartChangeTimer.AutoReset = false;
         currentTimeRefreshTimer.Elapsed += CurrentTimeRefreshTimer_Elapsed;
@@ -299,32 +305,32 @@ public partial class MainWindow : Window
 
     private void MirrorLeftRight_MenuItem_Click(object? sender, RoutedEventArgs e)
     {
-        var result = Mirror.NoteMirrorHandle(FumenContent.Selection.Text, Mirror.HandleType.LRMirror);
-        FumenContent.Selection.Text = result;
+        var result = Mirror.NoteMirrorHandle(FumenContent.SelectedText, Mirror.HandleType.LRMirror);
+        FumenContent.SelectedText = result;
     }
 
     private void MirrorUpDown_MenuItem_Click(object? sender, RoutedEventArgs e)
     {
-        var result = Mirror.NoteMirrorHandle(FumenContent.Selection.Text, Mirror.HandleType.UDMirror);
-        FumenContent.Selection.Text = result;
+        var result = Mirror.NoteMirrorHandle(FumenContent.SelectedText, Mirror.HandleType.UDMirror);
+        FumenContent.SelectedText = result;
     }
 
     private void Mirror180_MenuItem_Click(object? sender, RoutedEventArgs e)
     {
-        var result = Mirror.NoteMirrorHandle(FumenContent.Selection.Text, Mirror.HandleType.HalfRotation);
-        FumenContent.Selection.Text = result;
+        var result = Mirror.NoteMirrorHandle(FumenContent.SelectedText, Mirror.HandleType.HalfRotation);
+        FumenContent.SelectedText = result;
     }
 
     private void Mirror45_MenuItem_Click(object? sender, RoutedEventArgs e)
     {
-        var result = Mirror.NoteMirrorHandle(FumenContent.Selection.Text, Mirror.HandleType.Rotation45);
-        FumenContent.Selection.Text = result;
+        var result = Mirror.NoteMirrorHandle(FumenContent.SelectedText, Mirror.HandleType.Rotation45);
+        FumenContent.SelectedText = result;
     }
 
     private void MirrorCcw45_MenuItem_Click(object? sender, RoutedEventArgs e)
     {
-        var result = Mirror.NoteMirrorHandle(FumenContent.Selection.Text, Mirror.HandleType.CcwRotation45);
-        FumenContent.Selection.Text = result;
+        var result = Mirror.NoteMirrorHandle(FumenContent.SelectedText, Mirror.HandleType.CcwRotation45);
+        FumenContent.SelectedText = result;
     }
 
     private void BPMtap_MenuItem_Click(object? sender, RoutedEventArgs e)
@@ -586,19 +592,16 @@ public partial class MainWindow : Window
 
     #endregion
 
-    #region RichTextbox events
+    #region Text editor events
 
-    private void FumenContent_SelectionChanged(object sender, RoutedEventArgs e)
+    private void FumenContent_SelectionChanged(object? sender, EventArgs e)
     {
-        NoteNowText.Content = "" + (
-            new TextRange(FumenContent.Document.ContentStart, FumenContent.CaretPosition).Text.Replace("\r", "")
-                .Count(o => o == '\n') + 1) + " 行";
+        var currentLine = FumenContent.TextArea.Caret.Line;
+        NoteNowText.Content = currentLine + " 行";
         if (Bass.BASS_ChannelIsActive(bgmStream) == BASSActive.BASS_ACTIVE_PLAYING && (bool)FollowPlayCheck.IsChecked!)
             return;
-        //TODO:这个应该换成用fumen text position来在已经serialized的timinglist里面找。。 然后直接去掉这个double的返回和position的入参。。。
         var time = SimaiProcess.Serialize(GetRawFumenText(), GetRawFumenPosition());
 
-        //按住Ctrl，同时按下鼠标左键/上下左右方向键时，才改变进度，其他包含Ctrl的组合键不影响进度。
         if (Keyboard.Modifiers == ModifierKeys.Control && (
                 Mouse.LeftButton == MouseButtonState.Pressed ||
                 Keyboard.IsKeyDown(Key.Left) ||
@@ -612,16 +615,16 @@ public partial class MainWindow : Window
             SetBgmPosition(time);
         }
 
-        //Console.WriteLine("SelectionChanged");
         SimaiProcess.ClearNoteListPlayedState();
         ghostCusorPositionTime = (float)time;
         if (!isPlaying) DrawWave();
     }
 
-    private void FumenContent_TextChanged(object sender, TextChangedEventArgs e)
+    private void FumenContent_TextChanged(object? sender, EventArgs e)
     {
         if (GetRawFumenText() == "" || isLoading) return;
         SetSavedState(false);
+
         if (chartChangeTimer.Interval < 33)
         {
             SimaiProcess.Serialize(GetRawFumenText(), GetRawFumenPosition());
