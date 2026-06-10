@@ -114,6 +114,7 @@ public partial class MainWindow : Window
         timingList.AddRange(SimaiProcess.timinglist);
         FumenContent.CaretOffset = FumenContent.Document.GetOffset(
             theNote.rawTextPositionY + 1, theNote.rawTextPositionX + 1);
+        FumenContent.ScrollToLine(theNote.rawTextPositionY + 1);
     }
 
     private void SeekTextFromIndex(int noteGroupIndex)
@@ -123,6 +124,7 @@ public partial class MainWindow : Window
             var theNote = SimaiProcess.notelist[noteGroupIndex];
             FumenContent.CaretOffset = FumenContent.Document.GetOffset(
                 theNote.rawTextPositionY + 1, theNote.rawTextPositionX + 1);
+            FumenContent.ScrollToLine(theNote.rawTextPositionY + 1);
         }
     }
 
