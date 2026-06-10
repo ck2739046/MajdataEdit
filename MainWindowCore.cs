@@ -1434,9 +1434,8 @@ public partial class MainWindow : Window
 
     private void SwitchFumenOverwriteMode()
     {
-        // AvalonEdit does not support overtype mode in the same way as RichTextBox.
-        // Toggle visual indicator only.
         fumenOverwriteMode = !fumenOverwriteMode;
+        FumenContent.TextArea.OverstrikeMode = fumenOverwriteMode;
         OverrideModeTipsPopup.Visibility = fumenOverwriteMode ? Visibility.Visible : Visibility.Collapsed;
     }
 
