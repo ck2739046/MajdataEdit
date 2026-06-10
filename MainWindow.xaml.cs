@@ -85,6 +85,9 @@ public partial class MainWindow : Window
         FumenContent.TextArea.TextView.LineTransformers.Add(new SimaiColorizer());
         // 注册多倍行距生成器
         FumenContent.TextArea.TextView.ElementGenerators.Add(new LineSpacingGenerator(1.6));
+        // 禁用矩形选择（Alt+拖拽 和 Alt+Shift 方向键）
+        FumenContent.Options.EnableRectangularSelection = false;
+
         // 钩子 AvalonEdit 事件
         FumenContent.TextArea.Caret.PositionChanged += FumenContent_SelectionChanged;
         FumenContent.Document.TextChanged += FumenContent_TextChanged;
@@ -641,8 +644,34 @@ public partial class MainWindow : Window
 
     private void FumenContent_OnPreviewKeyDown(object sender, KeyEventArgs e)
     {
+        var mod = Keyboard.Modifiers;
+
+        // 禁用 Ctrl+←/→ （按词移动光标）
+        if ((e.Key == Key.Left || e.Key == Key.Right) && mod == ModifierKeys.Control)
+        {
+            e.Handled = true;
+            return;
+        }
+
+        // 禁用 Ctrl+Shift+←/→ （按词扩展选择）
+        if ((e.Key == Key.Left || e.Key == Key.Right) && mod == (ModifierKeys.Control | ModifierKeys.Shift))
+        {
+            e.Handled = true;
+            return;
+        }
+
+        // 禁用所有矩形选择快捷键（Alt+Shift 方向键 / Ctrl+Alt+Shift 方向键）
+        // 注：EnableRectangularSelection=false 已阻止 Alt+拖拽，这里处理键盘组合
+        if (mod.HasFlag(ModifierKeys.Alt) && mod.HasFlag(ModifierKeys.Shift)
+            && (e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.Up || e.Key == Key.Down
+                || e.Key == Key.Home || e.Key == Key.End))
+        {
+            e.Handled = true;
+            return;
+        }
+
         // 按下Insert键，同时未按下任何组合键，切换覆盖模式
-        if (e.Key == Key.Insert && Keyboard.Modifiers == ModifierKeys.None)
+        if (e.Key == Key.Insert && mod == ModifierKeys.None)
         {
             SwitchFumenOverwriteMode();
             e.Handled = true;
