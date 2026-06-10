@@ -670,6 +670,14 @@ public partial class MainWindow : Window
             return;
         }
 
+        // Ctrl+Shift+Z 触发 Redo（替代 Ctrl+Y）
+        if (e.Key == Key.Z && mod == (ModifierKeys.Control | ModifierKeys.Shift))
+        {
+            FumenContent.Document.UndoStack.Redo();
+            e.Handled = true;
+            return;
+        }
+
         // 禁用 Ctrl+Shift+←/→ （按词扩展选择）
         if ((e.Key == Key.Left || e.Key == Key.Right) && mod == (ModifierKeys.Control | ModifierKeys.Shift))
         {
