@@ -107,8 +107,6 @@ public partial class MainWindow : Window
             _controlFileWatcher.StartWatching();
         }
 
-        if (editorSetting!.AutoCheckUpdate) CheckUpdate(true);
-
         #region 异常退出处理
 
         if (!SafeTerminationDetector.Of().IsLastTerminationSafe())
@@ -414,11 +412,6 @@ public partial class MainWindow : Window
         {
             FindGrid.Visibility = Visibility.Collapsed;
         }
-    }
-
-    private void CheckUpdate_Click(object? sender, RoutedEventArgs e)
-    {
-        CheckUpdate();
     }
 
     private void Menu_AutosaveRecover_Click(object? sender, RoutedEventArgs e)

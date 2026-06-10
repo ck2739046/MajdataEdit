@@ -18,7 +18,6 @@ using MajdataEdit.AutoSaveModule;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Semver;
 using Un4seen.Bass;
 using Un4seen.Bass.AddOn.Fx;
 using WPFLocalizeExtension.Engine;
@@ -38,7 +37,6 @@ public partial class MainWindow : Window
     private const string majSettingFilename = "majSetting.json";
     private const string editorSettingFilename = "EditorSetting.json";
     public static readonly string MAJDATA_VERSION_STRING = $"v{Assembly.GetExecutingAssembly().GetName().Version!.ToString(3)}";
-    public static readonly SemVersion MAJDATA_VERSION = SemVersion.Parse(MAJDATA_VERSION_STRING, SemVersionStyles.Any);
 
     public static string maidataDir = "";
     public static string currentTrackFilename = "";
@@ -71,7 +69,6 @@ public partial class MainWindow : Window
     private double songLength;
 
     private SoundSetting soundSetting = new();
-    private bool UpdateCheckLock;
 
 
     //*UI DRAWING
@@ -1437,122 +1434,6 @@ public partial class MainWindow : Window
         fumenOverwriteMode = !fumenOverwriteMode;
         FumenContent.TextArea.OverstrikeMode = fumenOverwriteMode;
         OverrideModeTipsPopup.Visibility = fumenOverwriteMode ? Visibility.Visible : Visibility.Collapsed;
-    }
-
-    private void CheckUpdate(bool onStart = false)
-    {
-        if (UpdateCheckLock) return;
-        UpdateCheckLock = true;
-
-        #region 子函数
-
-        SemVersion oldVersionCompatible(string versionString)
-        {
-            var result = SemVersion.Parse("v0.0.0", SemVersionStyles.Any);
-            try
-            {
-                // 尝试解析版本号，解析失败说明是旧版本格式
-                result = SemVersion.Parse(versionString, SemVersionStyles.Any);
-            }
-            catch (FormatException)
-            {
-                if (versionString.Contains("Back2Root"))
-                {
-                    // back to root特别版本
-                    result = SemVersion.Parse("v0.0.0", SemVersionStyles.Any);
-                }
-                else if (versionString.Contains("Early Access"))
-                {
-                    // EA版本
-                    result = SemVersion.Parse("v0.0.1", SemVersionStyles.Any);
-                }
-                else if (versionString.Contains("Alpha"))
-                {
-                    // 旧版本格式 Alpha<MainVersion>.<SubVersion>[.<ModifiedVersion>]
-                    // 从4.0开始，结束于6.4
-                    // 在原版本号基础上增加 0. 主版本前缀，并增加 -alpha 后缀
-                    var startPos = versionString.IndexOfAny("0123456789".ToArray());
-                    versionString = "0." + versionString[startPos..];
-                    if (versionString.Count(c => { return c == '.'; }) > 2)
-                        versionString = versionString[..versionString.LastIndexOf('.')];
-                    versionString += "-alpha";
-                    result = SemVersion.Parse(versionString, SemVersionStyles.Any);
-                }
-                else if (versionString.Contains("Beta"))
-                {
-                    // 旧版本格式 Beta<MainVersion>.<SubVersion>[.<ModifiedVersion>]
-                    // 从1.0开始，结束于3.1。后续的语义化版本号继承该版本号进度，从4.0开始
-                    // 增加 -beta 后缀
-                    var startPos = versionString.IndexOfAny("0123456789".ToArray());
-                    versionString = versionString[startPos..];
-                    if (versionString.Contains(' '))
-                        versionString = versionString[..versionString.IndexOf(' ')];
-                    versionString += "-beta";
-                    result = SemVersion.Parse(versionString, SemVersionStyles.Any);
-                }
-                else
-                {
-                    // 其他无法识别的版本，均设置为v0.0.1-unknown
-                    result = SemVersion.Parse("v0.0.1-unknown", SemVersionStyles.Any);
-                }
-            }
-
-            return result;
-        }
-
-        void requestHandler(string response)
-        {
-            UpdateCheckLock = false;
-
-            var resJson = JsonConvert.DeserializeObject<JObject>(response)!;
-            var latestVersionString = resJson["tag_name"]!.ToString();
-            var releaseUrl = resJson["html_url"]!.ToString();
-
-            var latestVersion = oldVersionCompatible(latestVersionString);
-
-            if (latestVersion.ComparePrecedenceTo(MAJDATA_VERSION) > 0)
-            {
-                // 版本不同，需要更新
-                var msgboxText = string.Format(GetLocalizedString("NewVersionDetected"), latestVersionString,
-                    MAJDATA_VERSION_STRING);
-                if (onStart) msgboxText += "\n\n" + GetLocalizedString("AutoUpdateCheckTip");
-
-                var result = MessageBox.Show(
-                    msgboxText,
-                    GetLocalizedString("CheckUpdate"),
-                    MessageBoxButton.YesNo);
-                switch (result)
-                {
-                    case MessageBoxResult.Yes:
-                        var startInfo = new ProcessStartInfo(releaseUrl)
-                        {
-                            UseShellExecute = true
-                        };
-                        Process.Start(startInfo);
-                        break;
-                    case MessageBoxResult.No:
-                        break;
-                }
-            }
-            else
-            {
-                // 没有新版本，可以不用更新
-                if (!onStart) MessageBox.Show(GetLocalizedString("NoNewVersion"), GetLocalizedString("CheckUpdate"));
-            }
-        }
-
-        #endregion
-
-        // 检查是否需要更新软件
-
-        try
-        {
-            requestHandler(
-                WebControl.RequestGETAsync("http://api.github.com/repos/LingFeng-bbben/MajdataView/releases/latest"));
-        } catch {
-            // 网络请求失败
-            if (!onStart) MessageBox.Show(GetLocalizedString("RequestFail"), GetLocalizedString("CheckUpdate"));
-        }
     }
 
     public string GetWindowsTitleString()

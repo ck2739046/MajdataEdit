@@ -367,29 +367,8 @@ Insert key to switch back to normal mode.</value>
   <data name="SetVolumeDefaultSuccess" xml:space="preserve">
     <value>Default set</value>
   </data>
-  <data name="CheckUpdate" xml:space="preserve">
-    <value>Check for Updates</value>
-  </data>
-  <data name="AutoUpdateCheckTip" xml:space="preserve">
-    <value>You can disable AutoCheckUpdate in "Setting-&gt;Editor Setting"</value>
-  </data>
-  <data name="NewVersionDetected" xml:space="preserve">
-    <value>New Version detected: {0}
-(Current Version: {1})
-
-Do you want to download the latest update of Majdata?</value>
-  </data>
-  <data name="NoNewVersion" xml:space="preserve">
-    <value>You are already at the latest version</value>
-  </data>
-  <data name="RequestFail" xml:space="preserve">
-    <value>Failed to fetch data, please check your internet connection.</value>
-  </data>
   <data name="ChartRefreshDelay" xml:space="preserve">
     <value>Chart Refresh Interval (ms)</value>
-  </data>
-  <data name="AutoCheckUpdate" xml:space="preserve">
-    <value>Auto Check Update on Startup</value>
   </data>
   <data name="SetToDefaultVolume" xml:space="preserve">
     <value>Set Volume as Default Setting</value>

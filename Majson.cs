@@ -77,7 +77,6 @@ internal class MajSetting
 //this setting is global
 public class EditorSetting
 {
-    public bool AutoCheckUpdate = true;
     public float backgroundCover = 0.6f;
     public int ChartRefreshDelay = 1000;
     public EditorComboIndicator comboStatusType = 0;

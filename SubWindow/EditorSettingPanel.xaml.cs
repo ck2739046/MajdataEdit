@@ -58,7 +58,6 @@ public partial class EditorSettingPanel : Window
             ComboDisplay.SelectedIndex = 0;
 
         ChartRefreshDelay.Text = window.editorSetting.ChartRefreshDelay.ToString();
-        AutoUpdate.IsChecked = window.editorSetting.AutoCheckUpdate;
         SmoothSlideAnime.IsChecked = window.editorSetting.SmoothSlideAnime;
     }
 
@@ -104,7 +103,6 @@ public partial class EditorSettingPanel : Window
         window.editorSetting!.playSpeed = float.Parse(ViewerSpeed.Text);
         window.editorSetting!.touchSpeed = float.Parse(ViewerTouchSpeed.Text);
         window.editorSetting!.ChartRefreshDelay = int.Parse(ChartRefreshDelay.Text);
-        window.editorSetting!.AutoCheckUpdate = (bool) AutoUpdate.IsChecked!;
         window.editorSetting!.SmoothSlideAnime = (bool) SmoothSlideAnime.IsChecked!;
         // window.editorSetting.isComboEnabled = (bool) ComboDisplay.IsChecked!;
         window.editorSetting!.comboStatusType = (EditorComboIndicator)Enum.GetValues(

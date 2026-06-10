@@ -123,12 +123,6 @@
             <ComboBoxItem Content="{lex:Loc Key=ComboDisplayCScoreDownDedeluxe}" />
         </ComboBox>
 
-        <StackPanel Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal">
-            <CheckBox x:Name="AutoUpdate" VerticalAlignment="Center" />
-            <Label
-        Content="{lex:Loc Key=AutoCheckUpdate}" />
-        </StackPanel>
-
         <StackPanel Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal">
             <CheckBox x:Name="SmoothSlideAnime" VerticalAlignment="Center" />
             <Label
