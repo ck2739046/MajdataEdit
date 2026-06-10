@@ -428,28 +428,19 @@ public partial class MainWindow : Window
 
     #region 快捷键
 
-    private void PlayAndPause_CanExecute(object? sender, CanExecuteRoutedEventArgs e) //快捷键
-    {
-        TogglePlayAndPause();
-    }
+    private void PlayAndPause_Executed(object? sender, ExecutedRoutedEventArgs e) { TogglePlayAndPause(); }
 
-    private void StopPlaying_CanExecute(object? sender, CanExecuteRoutedEventArgs e) //快捷键
-    {
-        TogglePlayAndStop();
-    }
+    private void StopPlaying_Executed(object? sender, ExecutedRoutedEventArgs e) { TogglePlayAndStop(); }
 
-    private void SaveFile_Command_CanExecute(object? sender, CanExecuteRoutedEventArgs e)
+    private void SaveFile_Executed(object? sender, ExecutedRoutedEventArgs e)
     {
         SaveFumen(true);
         SystemSounds.Beep.Play();
     }
 
-    private void SendToView_CanExecute(object? sender, CanExecuteRoutedEventArgs e)
-    {
-        TogglePlayAndStop(PlayMethod.Op);
-    }
+    private void SendToView_Executed(object? sender, ExecutedRoutedEventArgs e) { TogglePlayAndStop(PlayMethod.Op); }
 
-    private void IncreasePlaybackSpeed_CanExecute(object? sender, CanExecuteRoutedEventArgs e)
+    private void IncreasePlaybackSpeed_Executed(object? sender, ExecutedRoutedEventArgs e)
     {
         if (Bass.BASS_ChannelIsActive(bgmStream) == BASSActive.BASS_ACTIVE_PLAYING) return;
         var speed = GetPlaybackSpeed();
@@ -462,13 +453,13 @@ public partial class MainWindow : Window
         playbackSpeedHideTimer.Start();
     }
 
-    private void DecreasePlaybackSpeed_CanExecute(object? sender, CanExecuteRoutedEventArgs e)
+    private void DecreasePlaybackSpeed_Executed(object? sender, ExecutedRoutedEventArgs e)
     {
         if (Bass.BASS_ChannelIsActive(bgmStream) == BASSActive.BASS_ACTIVE_PLAYING) return;
         var speed = GetPlaybackSpeed();
         Console.WriteLine(speed);
         speed -= 0.25f;
-        if (speed < 1e-6) return; // Interrupt if it's an epsilon or lower.
+        if (speed < 1e-6) return;
         PlbSpdLabel.Content = speed * 100 + "%";
         SetPlaybackSpeed(speed);
         PlbSpdAdjGrid.Visibility = Visibility.Visible;
@@ -484,7 +475,7 @@ public partial class MainWindow : Window
         ((Timer)sender!).Stop();
     }
 
-    private void FindCommand_CanExecute(object? sender, CanExecuteRoutedEventArgs e)
+    private void Find_Executed(object? sender, ExecutedRoutedEventArgs e)
     {
         if (FindGrid.Visibility == Visibility.Collapsed)
         {
@@ -497,30 +488,15 @@ public partial class MainWindow : Window
         }
     }
 
-    private void MirrorLRCommand_CanExecute(object? sender, CanExecuteRoutedEventArgs e)
-    {
-        MirrorLeftRight_MenuItem_Click(sender, null);
-    }
+    private void MirrorLR_Executed(object? sender, ExecutedRoutedEventArgs e) { MirrorLeftRight_MenuItem_Click(sender, null); }
 
-    private void MirrorUDCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-    {
-        MirrorUpDown_MenuItem_Click(sender, null);
-    }
+    private void MirrorUD_Executed(object? sender, ExecutedRoutedEventArgs e) { MirrorUpDown_MenuItem_Click(sender, null); }
 
-    private void Mirror180Command_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-    {
-        Mirror180_MenuItem_Click(sender, null);
-    }
+    private void Mirror180_Executed(object? sender, ExecutedRoutedEventArgs e) { Mirror180_MenuItem_Click(sender, null); }
 
-    private void Mirror45Command_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-    {
-        Mirror45_MenuItem_Click(sender, null);
-    }
+    private void Mirror45_Executed(object? sender, ExecutedRoutedEventArgs e) { Mirror45_MenuItem_Click(sender, null); }
 
-    private void MirrorCcw45Command_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-    {
-        MirrorCcw45_MenuItem_Click(sender, null);
-    }
+    private void MirrorCcw45_Executed(object? sender, ExecutedRoutedEventArgs e) { MirrorCcw45_MenuItem_Click(sender, null); }
 
     #endregion
 
@@ -758,13 +734,13 @@ public partial class MainWindow : Window
     private void DecreaseSpeedButton_Click(object sender, RoutedEventArgs e)
     {
         // 直接调用减速命令，模拟按下Ctrl+o快捷键
-        DecreasePlaybackSpeed_CanExecute(this, null);
+        DecreasePlaybackSpeed_Executed(this, null);
     }
 
     private void IncreaseSpeedButton_Click(object sender, RoutedEventArgs e)
     {
         // 直接调用加速命令，模拟按下Ctrl+p快捷键
-        IncreasePlaybackSpeed_CanExecute(this, null);
+        IncreasePlaybackSpeed_Executed(this, null);
     }
 
     private void JumpToStartButton_Click(object sender, RoutedEventArgs e)

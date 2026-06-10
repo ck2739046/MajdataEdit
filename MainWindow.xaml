@@ -29,18 +29,18 @@
     </Window.Resources>
 
     <Window.CommandBindings>
-        <CommandBinding Command="{StaticResource PlayAndPause}" CanExecute="PlayAndPause_CanExecute" />
-        <CommandBinding Command="{StaticResource SaveFile}" CanExecute="SaveFile_Command_CanExecute" />
-        <CommandBinding Command="{StaticResource StopPlaying}" CanExecute="StopPlaying_CanExecute" />
-        <CommandBinding Command="{StaticResource SendToView}" CanExecute="SendToView_CanExecute" />
-        <CommandBinding Command="{StaticResource IncreasePlaybackSpeed}" CanExecute="IncreasePlaybackSpeed_CanExecute" />
-        <CommandBinding Command="{StaticResource DecreasePlaybackSpeed}" CanExecute="DecreasePlaybackSpeed_CanExecute" />
-        <CommandBinding Command="{StaticResource Find}" CanExecute="FindCommand_CanExecute" />
-        <CommandBinding Command="{StaticResource MirrorLR}" CanExecute="MirrorLRCommand_CanExecute" />
-        <CommandBinding Command="{StaticResource MirrorUD}" CanExecute="MirrorUDCommand_CanExecute" />
-        <CommandBinding Command="{StaticResource Mirror180}" CanExecute="Mirror180Command_CanExecute" />
-        <CommandBinding Command="{StaticResource Mirror45}" CanExecute="Mirror45Command_CanExecute" />
-        <CommandBinding Command="{StaticResource MirrorCcw45}" CanExecute="MirrorCcw45Command_CanExecute" />
+        <CommandBinding Command="{StaticResource PlayAndPause}" Executed="PlayAndPause_Executed" />
+        <CommandBinding Command="{StaticResource SaveFile}" Executed="SaveFile_Executed" />
+        <CommandBinding Command="{StaticResource StopPlaying}" Executed="StopPlaying_Executed" />
+        <CommandBinding Command="{StaticResource SendToView}" Executed="SendToView_Executed" />
+        <CommandBinding Command="{StaticResource IncreasePlaybackSpeed}" Executed="IncreasePlaybackSpeed_Executed" />
+        <CommandBinding Command="{StaticResource DecreasePlaybackSpeed}" Executed="DecreasePlaybackSpeed_Executed" />
+        <CommandBinding Command="{StaticResource Find}" Executed="Find_Executed" />
+        <CommandBinding Command="{StaticResource MirrorLR}" Executed="MirrorLR_Executed" />
+        <CommandBinding Command="{StaticResource MirrorUD}" Executed="MirrorUD_Executed" />
+        <CommandBinding Command="{StaticResource Mirror180}" Executed="Mirror180_Executed" />
+        <CommandBinding Command="{StaticResource Mirror45}" Executed="Mirror45_Executed" />
+        <CommandBinding Command="{StaticResource MirrorCcw45}" Executed="MirrorCcw45_Executed" />
     </Window.CommandBindings>
 
     <Grid Margin="0" DragEnter="Grid_DragEnter" AllowDrop="True" Drop="Grid_Drop">
