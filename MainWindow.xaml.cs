@@ -645,10 +645,27 @@ public partial class MainWindow : Window
     private void FumenContent_OnPreviewKeyDown(object sender, KeyEventArgs e)
     {
         var mod = Keyboard.Modifiers;
+        var caret = FumenContent.TextArea.Caret;
+        var doc = FumenContent.Document;
 
-        // 禁用 Ctrl+←/→ （按词移动光标）
+        // Ctrl+←/→ 逐字符移动光标（替代 AvalonEdit 的按词移动），触发音频定位
         if ((e.Key == Key.Left || e.Key == Key.Right) && mod == ModifierKeys.Control)
         {
+            if (e.Key == Key.Left && caret.Offset > 0)
+                caret.Offset--;
+            else if (e.Key == Key.Right && caret.Offset < doc.TextLength)
+                caret.Offset++;
+            e.Handled = true;
+            return;
+        }
+
+        // Ctrl+↑/↓ 逐行移动光标（替代 WPF ScrollViewer 的滚动），触发音频定位
+        if ((e.Key == Key.Up || e.Key == Key.Down) && mod == ModifierKeys.Control)
+        {
+            if (e.Key == Key.Up && caret.Line > 1)
+                caret.Line--;
+            else if (e.Key == Key.Down && caret.Line < doc.LineCount)
+                caret.Line++;
             e.Handled = true;
             return;
         }
