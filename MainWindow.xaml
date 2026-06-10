@@ -99,6 +99,8 @@
                 <MenuItem Header="{lex:Loc EditorSetting}" Click="MenuItem_EditorSetting_Click" />
                 <MenuItem Header="{lex:Loc RemapViewer}" Click="Menu_ResetViewWindow" />
             </MenuItem>
+            <MenuItem Header="{lex:Loc ShortcutHelpTitle}" Click="MenuItem_ShortcutHelp_Click"
+                      Foreground="{DynamicResource ButtonForeground}" Template="{DynamicResource DarkMenuItem}" />
             <MenuItem Header="{lex:Loc Tools}" Foreground="{DynamicResource ButtonForeground}"
                       Template="{DynamicResource DarkMenuItem}">
                 <MenuItem Header="{lex:Loc BPMtap}" Click="BPMtap_MenuItem_Click" />

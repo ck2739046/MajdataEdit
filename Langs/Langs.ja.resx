@@ -493,4 +493,58 @@ Open Browser to download latest update of Majdata?</value>
     <value>When enabled, the Slide Track will disappear with the star instead of one judgment area after another.</value>
     <comment>Translation required</comment>
   </data>
+  <data name="ShortcutHelpTitle" xml:space="preserve">
+    <value>ショートカット一覧</value>
+  </data>
+  <data name="SK_Function" xml:space="preserve">
+    <value>機能</value>
+  </data>
+  <data name="SK_ShortcutKey" xml:space="preserve">
+    <value>ショートカット</value>
+  </data>
+  <data name="SK_PlayPause" xml:space="preserve">
+    <value>再生 / 一時停止</value>
+  </data>
+  <data name="SK_StopPlaying" xml:space="preserve">
+    <value>再生 / 停止</value>
+  </data>
+  <data name="SK_SaveFile" xml:space="preserve">
+    <value>ファイル保存</value>
+  </data>
+  <data name="SK_SendToView" xml:space="preserve">
+    <value>MajdataView に送信</value>
+  </data>
+  <data name="SK_IncreaseSpeed" xml:space="preserve">
+    <value>再生速度アップ</value>
+  </data>
+  <data name="SK_DecreaseSpeed" xml:space="preserve">
+    <value>再生速度ダウン</value>
+  </data>
+  <data name="SK_Find" xml:space="preserve">
+    <value>検索 / 置換</value>
+  </data>
+  <data name="SK_MirrorLR" xml:space="preserve">
+    <value>左右ミラー</value>
+  </data>
+  <data name="SK_MirrorUD" xml:space="preserve">
+    <value>上下ミラー</value>
+  </data>
+  <data name="SK_Mirror180" xml:space="preserve">
+    <value>180° 回転</value>
+  </data>
+  <data name="SK_Mirror45" xml:space="preserve">
+    <value> 45° 回転</value>
+  </data>
+  <data name="SK_MirrorCcw45" xml:space="preserve">
+    <value>-45° 回転</value>
+  </data>
+  <data name="SK_CtrlArrow" xml:space="preserve">
+    <value>キャレット移動＆音声シーク</value>
+  </data>
+  <data name="SK_CtrlClick" xml:space="preserve">
+    <value>音声をキャレット位置へシーク</value>
+  </data>
+  <data name="SK_CtrlClick_Key" xml:space="preserve">
+    <value>Ctrl + 左クリック</value>
+  </data>
 </root>

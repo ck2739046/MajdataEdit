@@ -455,4 +455,58 @@
   <data name="SmoothSlideAnimeTooltip" xml:space="preserve">
     <value>启用后，Slide轨迹会随着星星消失，而不是以判定区为单位消失</value>
   </data>
+  <data name="ShortcutHelpTitle" xml:space="preserve">
+    <value>快捷键帮助</value>
+  </data>
+  <data name="SK_Function" xml:space="preserve">
+    <value>功能</value>
+  </data>
+  <data name="SK_ShortcutKey" xml:space="preserve">
+    <value>快捷键</value>
+  </data>
+  <data name="SK_PlayPause" xml:space="preserve">
+    <value>播放 / 暂停</value>
+  </data>
+  <data name="SK_StopPlaying" xml:space="preserve">
+    <value>播放 / 停止播放</value>
+  </data>
+  <data name="SK_SaveFile" xml:space="preserve">
+    <value>保存文件</value>
+  </data>
+  <data name="SK_SendToView" xml:space="preserve">
+    <value>发送到 MajdataView</value>
+  </data>
+  <data name="SK_IncreaseSpeed" xml:space="preserve">
+    <value>加速播放</value>
+  </data>
+  <data name="SK_DecreaseSpeed" xml:space="preserve">
+    <value>减速播放</value>
+  </data>
+  <data name="SK_Find" xml:space="preserve">
+    <value>查找 / 替换</value>
+  </data>
+  <data name="SK_MirrorLR" xml:space="preserve">
+    <value>左右镜像</value>
+  </data>
+  <data name="SK_MirrorUD" xml:space="preserve">
+    <value>上下镜像</value>
+  </data>
+  <data name="SK_Mirror180" xml:space="preserve">
+    <value>180° 旋转</value>
+  </data>
+  <data name="SK_Mirror45" xml:space="preserve">
+    <value> 45° 旋转</value>
+  </data>
+  <data name="SK_MirrorCcw45" xml:space="preserve">
+    <value>-45° 旋转</value>
+  </data>
+  <data name="SK_CtrlArrow" xml:space="preserve">
+    <value>移动光标并定位音频</value>
+  </data>
+  <data name="SK_CtrlClick" xml:space="preserve">
+    <value>定位音频到光标</value>
+  </data>
+  <data name="SK_CtrlClick_Key" xml:space="preserve">
+    <value>Ctrl + 左键点击</value>
+  </data>
 </root>

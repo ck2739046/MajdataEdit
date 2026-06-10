@@ -391,6 +391,12 @@ public partial class MainWindow : Window
         esp.ShowDialog();
     }
 
+    private void MenuItem_ShortcutHelp_Click(object? sender, RoutedEventArgs e)
+    {
+        var win = new ShortcutHelp { Owner = this };
+        win.ShowDialog();
+    }
+
     private void Menu_ResetViewWindow(object? sender, RoutedEventArgs e)
     {
         if (CheckAndStartView()) return;
