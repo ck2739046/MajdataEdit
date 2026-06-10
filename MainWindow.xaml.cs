@@ -81,6 +81,17 @@ public partial class MainWindow : Window
         ReadSoundEffect();
         ReadEditorSetting();
 
+        // 注册 Simai 语法高亮着色器（AvalonEdit 渲染层着色，不影响文字模型）
+        FumenContent.TextArea.TextView.LineTransformers.Add(new SimaiColorizer());
+        // 注册多倍行距生成器
+        FumenContent.TextArea.TextView.ElementGenerators.Add(new LineSpacingGenerator(1.6));
+        // 禁用矩形选择（Alt+拖拽 和 Alt+Shift 方向键）
+        FumenContent.Options.EnableRectangularSelection = false;
+
+        // 钩子 AvalonEdit 事件
+        FumenContent.TextArea.Caret.PositionChanged += FumenContent_SelectionChanged;
+        FumenContent.Document.TextChanged += FumenContent_TextChanged;
+
         chartChangeTimer.Elapsed += ChartChangeTimer_Elapsed;
         chartChangeTimer.AutoReset = false;
         currentTimeRefreshTimer.Elapsed += CurrentTimeRefreshTimer_Elapsed;
@@ -299,32 +310,32 @@ public partial class MainWindow : Window
 
     private void MirrorLeftRight_MenuItem_Click(object? sender, RoutedEventArgs e)
     {
-        var result = Mirror.NoteMirrorHandle(FumenContent.Selection.Text, Mirror.HandleType.LRMirror);
-        FumenContent.Selection.Text = result;
+        var result = Mirror.NoteMirrorHandle(FumenContent.SelectedText, Mirror.HandleType.LRMirror);
+        FumenContent.SelectedText = result;
     }
 
     private void MirrorUpDown_MenuItem_Click(object? sender, RoutedEventArgs e)
     {
-        var result = Mirror.NoteMirrorHandle(FumenContent.Selection.Text, Mirror.HandleType.UDMirror);
-        FumenContent.Selection.Text = result;
+        var result = Mirror.NoteMirrorHandle(FumenContent.SelectedText, Mirror.HandleType.UDMirror);
+        FumenContent.SelectedText = result;
     }
 
     private void Mirror180_MenuItem_Click(object? sender, RoutedEventArgs e)
     {
-        var result = Mirror.NoteMirrorHandle(FumenContent.Selection.Text, Mirror.HandleType.HalfRotation);
-        FumenContent.Selection.Text = result;
+        var result = Mirror.NoteMirrorHandle(FumenContent.SelectedText, Mirror.HandleType.HalfRotation);
+        FumenContent.SelectedText = result;
     }
 
     private void Mirror45_MenuItem_Click(object? sender, RoutedEventArgs e)
     {
-        var result = Mirror.NoteMirrorHandle(FumenContent.Selection.Text, Mirror.HandleType.Rotation45);
-        FumenContent.Selection.Text = result;
+        var result = Mirror.NoteMirrorHandle(FumenContent.SelectedText, Mirror.HandleType.Rotation45);
+        FumenContent.SelectedText = result;
     }
 
     private void MirrorCcw45_MenuItem_Click(object? sender, RoutedEventArgs e)
     {
-        var result = Mirror.NoteMirrorHandle(FumenContent.Selection.Text, Mirror.HandleType.CcwRotation45);
-        FumenContent.Selection.Text = result;
+        var result = Mirror.NoteMirrorHandle(FumenContent.SelectedText, Mirror.HandleType.CcwRotation45);
+        FumenContent.SelectedText = result;
     }
 
     private void BPMtap_MenuItem_Click(object? sender, RoutedEventArgs e)
@@ -380,6 +391,12 @@ public partial class MainWindow : Window
         esp.ShowDialog();
     }
 
+    private void MenuItem_ShortcutHelp_Click(object? sender, RoutedEventArgs e)
+    {
+        var win = new ShortcutHelp { Owner = this };
+        win.ShowDialog();
+    }
+
     private void Menu_ResetViewWindow(object? sender, RoutedEventArgs e)
     {
         if (CheckAndStartView()) return;
@@ -417,28 +434,19 @@ public partial class MainWindow : Window
 
     #region 快捷键
 
-    private void PlayAndPause_CanExecute(object? sender, CanExecuteRoutedEventArgs e) //快捷键
-    {
-        TogglePlayAndStop();
-    }
+    private void PlayAndPause_Executed(object? sender, ExecutedRoutedEventArgs e) { TogglePlayAndPause(); }
 
-    private void StopPlaying_CanExecute(object? sender, CanExecuteRoutedEventArgs e) //快捷键
-    {
-        TogglePlayAndPause();
-    }
+    private void StopPlaying_Executed(object? sender, ExecutedRoutedEventArgs e) { TogglePlayAndStop(); }
 
-    private void SaveFile_Command_CanExecute(object? sender, CanExecuteRoutedEventArgs e)
+    private void SaveFile_Executed(object? sender, ExecutedRoutedEventArgs e)
     {
         SaveFumen(true);
         SystemSounds.Beep.Play();
     }
 
-    private void SendToView_CanExecute(object? sender, CanExecuteRoutedEventArgs e)
-    {
-        TogglePlayAndStop(PlayMethod.Op);
-    }
+    private void SendToView_Executed(object? sender, ExecutedRoutedEventArgs e) { TogglePlayAndStop(PlayMethod.Op); }
 
-    private void IncreasePlaybackSpeed_CanExecute(object? sender, CanExecuteRoutedEventArgs e)
+    private void IncreasePlaybackSpeed_Executed(object? sender, ExecutedRoutedEventArgs e)
     {
         if (Bass.BASS_ChannelIsActive(bgmStream) == BASSActive.BASS_ACTIVE_PLAYING) return;
         var speed = GetPlaybackSpeed();
@@ -451,13 +459,13 @@ public partial class MainWindow : Window
         playbackSpeedHideTimer.Start();
     }
 
-    private void DecreasePlaybackSpeed_CanExecute(object? sender, CanExecuteRoutedEventArgs e)
+    private void DecreasePlaybackSpeed_Executed(object? sender, ExecutedRoutedEventArgs e)
     {
         if (Bass.BASS_ChannelIsActive(bgmStream) == BASSActive.BASS_ACTIVE_PLAYING) return;
         var speed = GetPlaybackSpeed();
         Console.WriteLine(speed);
         speed -= 0.25f;
-        if (speed < 1e-6) return; // Interrupt if it's an epsilon or lower.
+        if (speed < 1e-6) return;
         PlbSpdLabel.Content = speed * 100 + "%";
         SetPlaybackSpeed(speed);
         PlbSpdAdjGrid.Visibility = Visibility.Visible;
@@ -473,7 +481,7 @@ public partial class MainWindow : Window
         ((Timer)sender!).Stop();
     }
 
-    private void FindCommand_CanExecute(object? sender, CanExecuteRoutedEventArgs e)
+    private void Find_Executed(object? sender, ExecutedRoutedEventArgs e)
     {
         if (FindGrid.Visibility == Visibility.Collapsed)
         {
@@ -486,30 +494,15 @@ public partial class MainWindow : Window
         }
     }
 
-    private void MirrorLRCommand_CanExecute(object? sender, CanExecuteRoutedEventArgs e)
-    {
-        MirrorLeftRight_MenuItem_Click(sender, null);
-    }
+    private void MirrorLR_Executed(object? sender, ExecutedRoutedEventArgs e) { MirrorLeftRight_MenuItem_Click(sender, null); }
 
-    private void MirrorUDCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-    {
-        MirrorUpDown_MenuItem_Click(sender, null);
-    }
+    private void MirrorUD_Executed(object? sender, ExecutedRoutedEventArgs e) { MirrorUpDown_MenuItem_Click(sender, null); }
 
-    private void Mirror180Command_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-    {
-        Mirror180_MenuItem_Click(sender, null);
-    }
+    private void Mirror180_Executed(object? sender, ExecutedRoutedEventArgs e) { Mirror180_MenuItem_Click(sender, null); }
 
-    private void Mirror45Command_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-    {
-        Mirror45_MenuItem_Click(sender, null);
-    }
+    private void Mirror45_Executed(object? sender, ExecutedRoutedEventArgs e) { Mirror45_MenuItem_Click(sender, null); }
 
-    private void MirrorCcw45Command_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-    {
-        MirrorCcw45_MenuItem_Click(sender, null);
-    }
+    private void MirrorCcw45_Executed(object? sender, ExecutedRoutedEventArgs e) { MirrorCcw45_MenuItem_Click(sender, null); }
 
     #endregion
 
@@ -586,19 +579,16 @@ public partial class MainWindow : Window
 
     #endregion
 
-    #region RichTextbox events
+    #region Text editor events
 
-    private void FumenContent_SelectionChanged(object sender, RoutedEventArgs e)
+    private void FumenContent_SelectionChanged(object? sender, EventArgs e)
     {
-        NoteNowText.Content = "" + (
-            new TextRange(FumenContent.Document.ContentStart, FumenContent.CaretPosition).Text.Replace("\r", "")
-                .Count(o => o == '\n') + 1) + " 行";
+        var currentLine = FumenContent.TextArea.Caret.Line;
+        NoteNowText.Content = currentLine + " 行";
         if (Bass.BASS_ChannelIsActive(bgmStream) == BASSActive.BASS_ACTIVE_PLAYING && (bool)FollowPlayCheck.IsChecked!)
             return;
-        //TODO:这个应该换成用fumen text position来在已经serialized的timinglist里面找。。 然后直接去掉这个double的返回和position的入参。。。
         var time = SimaiProcess.Serialize(GetRawFumenText(), GetRawFumenPosition());
 
-        //按住Ctrl，同时按下鼠标左键/上下左右方向键时，才改变进度，其他包含Ctrl的组合键不影响进度。
         if (Keyboard.Modifiers == ModifierKeys.Control && (
                 Mouse.LeftButton == MouseButtonState.Pressed ||
                 Keyboard.IsKeyDown(Key.Left) ||
@@ -612,16 +602,16 @@ public partial class MainWindow : Window
             SetBgmPosition(time);
         }
 
-        //Console.WriteLine("SelectionChanged");
         SimaiProcess.ClearNoteListPlayedState();
         ghostCusorPositionTime = (float)time;
         if (!isPlaying) DrawWave();
     }
 
-    private void FumenContent_TextChanged(object sender, TextChangedEventArgs e)
+    private void FumenContent_TextChanged(object? sender, EventArgs e)
     {
         if (GetRawFumenText() == "" || isLoading) return;
         SetSavedState(false);
+
         if (chartChangeTimer.Interval < 33)
         {
             SimaiProcess.Serialize(GetRawFumenText(), GetRawFumenPosition());
@@ -636,8 +626,59 @@ public partial class MainWindow : Window
 
     private void FumenContent_OnPreviewKeyDown(object sender, KeyEventArgs e)
     {
+        var mod = Keyboard.Modifiers;
+        var caret = FumenContent.TextArea.Caret;
+        var doc = FumenContent.Document;
+
+        // Ctrl+←/→ 逐字符移动光标（替代 AvalonEdit 的按词移动），触发音频定位
+        if ((e.Key == Key.Left || e.Key == Key.Right) && mod == ModifierKeys.Control)
+        {
+            if (e.Key == Key.Left && caret.Offset > 0)
+                caret.Offset--;
+            else if (e.Key == Key.Right && caret.Offset < doc.TextLength)
+                caret.Offset++;
+            e.Handled = true;
+            return;
+        }
+
+        // Ctrl+↑/↓ 逐行移动光标（替代 WPF ScrollViewer 的滚动），触发音频定位
+        if ((e.Key == Key.Up || e.Key == Key.Down) && mod == ModifierKeys.Control)
+        {
+            if (e.Key == Key.Up && caret.Line > 1)
+                caret.Line--;
+            else if (e.Key == Key.Down && caret.Line < doc.LineCount)
+                caret.Line++;
+            e.Handled = true;
+            return;
+        }
+
+        // Ctrl+Shift+Z 触发 Redo（替代 Ctrl+Y）
+        if (e.Key == Key.Z && mod == (ModifierKeys.Control | ModifierKeys.Shift))
+        {
+            FumenContent.Document.UndoStack.Redo();
+            e.Handled = true;
+            return;
+        }
+
+        // 禁用 Ctrl+Shift+←/→ （按词扩展选择）
+        if ((e.Key == Key.Left || e.Key == Key.Right) && mod == (ModifierKeys.Control | ModifierKeys.Shift))
+        {
+            e.Handled = true;
+            return;
+        }
+
+        // 禁用所有矩形选择快捷键（Alt+Shift 方向键 / Ctrl+Alt+Shift 方向键）
+        // 注：EnableRectangularSelection=false 已阻止 Alt+拖拽，这里处理键盘组合
+        if (mod.HasFlag(ModifierKeys.Alt) && mod.HasFlag(ModifierKeys.Shift)
+            && (e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.Up || e.Key == Key.Down
+                || e.Key == Key.Home || e.Key == Key.End))
+        {
+            e.Handled = true;
+            return;
+        }
+
         // 按下Insert键，同时未按下任何组合键，切换覆盖模式
-        if (e.Key == Key.Insert && Keyboard.Modifiers == ModifierKeys.None)
+        if (e.Key == Key.Insert && mod == ModifierKeys.None)
         {
             SwitchFumenOverwriteMode();
             e.Handled = true;
@@ -699,13 +740,13 @@ public partial class MainWindow : Window
     private void DecreaseSpeedButton_Click(object sender, RoutedEventArgs e)
     {
         // 直接调用减速命令，模拟按下Ctrl+o快捷键
-        DecreasePlaybackSpeed_CanExecute(this, null);
+        DecreasePlaybackSpeed_Executed(this, null);
     }
 
     private void IncreaseSpeedButton_Click(object sender, RoutedEventArgs e)
     {
         // 直接调用加速命令，模拟按下Ctrl+p快捷键
-        IncreasePlaybackSpeed_CanExecute(this, null);
+        IncreasePlaybackSpeed_Executed(this, null);
     }
 
     private void JumpToStartButton_Click(object sender, RoutedEventArgs e)

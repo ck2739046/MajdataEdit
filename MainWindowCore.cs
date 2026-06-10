@@ -64,7 +64,6 @@ public partial class MainWindow : Window
     private bool isSaved = true;
     public bool IsSaved => isSaved;
     private EditorControlMethod lastEditorState;
-    private TextSelection? lastFindPosition;
 
     private double lastMousePointX; //Used for drag scroll
 
@@ -83,44 +82,30 @@ public partial class MainWindow : Window
     //*TEXTBOX CONTROL
     private string GetRawFumenText()
     {
-        var text = new TextRange(FumenContent.Document.ContentStart, FumenContent.Document.ContentEnd).Text!;
-
-        text = text.Replace("\r", "");
-        // 亲爱的bbben在这里对text进行了Trim 引发了行位置不正确的BUG 谨此纪念（
-        return text;
+        return FumenContent.Document.Text.Replace("\r", "");
     }
 
     private void SetRawFumenText(string content)
     {
         isLoading = true;
-        FumenContent.Document.Blocks.Clear();
         if (content == null)
         {
+            FumenContent.Document.Text = "";
             isLoading = false;
             return;
         }
 
-        var lines = content.Split('\n');
-        foreach (var line in lines)
-        {
-            var paragraph = new Paragraph();
-            paragraph.Inlines.Add(line);
-            FumenContent.Document.Blocks.Add(paragraph);
-        }
-
+        FumenContent.Document.Text = content;
         isLoading = false;
     }
 
     private long GetRawFumenPosition()
     {
-        long pos = new TextRange(FumenContent.Document.ContentStart, FumenContent.CaretPosition).Text.Replace("\r", "")
-            .Length;
-        return pos;
+        return FumenContent.CaretOffset;
     }
 
     private void SeekTextFromTime()
     {
-        //Console.WriteLine("SeekText");
         var time = Bass.BASS_ChannelBytes2Seconds(bgmStream, Bass.BASS_ChannelGetPosition(bgmStream));
         var timingList = new List<SimaiTimingPoint>();
         timingList.AddRange(SimaiProcess.timinglist);
@@ -130,10 +115,8 @@ public partial class MainWindow : Window
         var theNote = timingList[0];
         timingList.Clear();
         timingList.AddRange(SimaiProcess.timinglist);
-        var indexOfTheNote = timingList.IndexOf(theNote);
-        var pointer = FumenContent.Document.Blocks.ToList()[theNote.rawTextPositionY].ContentStart
-            .GetPositionAtOffset(theNote.rawTextPositionX);
-        FumenContent.Selection.Select(pointer, pointer);
+        FumenContent.CaretOffset = FumenContent.Document.GetOffset(
+            theNote.rawTextPositionY + 1, theNote.rawTextPositionX + 1);
     }
 
     private void SeekTextFromIndex(int noteGroupIndex)
@@ -141,18 +124,15 @@ public partial class MainWindow : Window
         if (SimaiProcess.notelist.Count > noteGroupIndex + 1 && noteGroupIndex >= 0)
         {
             var theNote = SimaiProcess.notelist[noteGroupIndex];
-            var pointer = FumenContent.Document.Blocks.ToList()[theNote.rawTextPositionY].ContentStart
-                .GetPositionAtOffset(theNote.rawTextPositionX);
-            FumenContent.Selection.Select(pointer, pointer);
+            FumenContent.CaretOffset = FumenContent.Document.GetOffset(
+                theNote.rawTextPositionY + 1, theNote.rawTextPositionX + 1);
         }
     }
 
     public void ScrollToFumenContentSelection(int positionX, int positionY)
     {
-        // 这玩意用于其他窗口来滚动Scroll 因为涉及到好多变量都是private的
-        var pointer = FumenContent.Document.Blocks.ToList()[positionY].ContentStart.GetPositionAtOffset(positionX);
+        FumenContent.CaretOffset = FumenContent.Document.GetOffset(positionY + 1, positionX + 1);
         FumenContent.Focus();
-        FumenContent.Selection.Select(pointer, pointer);
         Focus();
 
         if (Bass.BASS_ChannelIsActive(bgmStream) == BASSActive.BASS_ACTIVE_PLAYING && (bool)FollowPlayCheck.IsChecked!)
@@ -178,9 +158,11 @@ public partial class MainWindow : Window
             return;
         }
 
-        if (FumenContent.Selection == lastFindPosition)
+        if (lastFindStart >= 0 && lastFindLength > 0 &&
+            FumenContent.SelectionStart == lastFindStart &&
+            FumenContent.SelectionLength == lastFindLength)
         {
-            FumenContent.Selection.Text = ReplaceText.Text;
+            FumenContent.SelectedText = ReplaceText.Text;
             FindAndScroll();
         }
         else
@@ -189,56 +171,36 @@ public partial class MainWindow : Window
         }
     }
 
-    public TextRange? GetTextRangeFromPosition(TextPointer position, string input)
-    {
-        TextRange? textRange = null;
-
-        while (position != null)
-        {
-            if (position.CompareTo(FumenContent.Document.ContentEnd) == 0) break;
-
-            if (position.GetPointerContext(LogicalDirection.Forward) == TextPointerContext.Text)
-            {
-                var textRun = position.GetTextInRun(LogicalDirection.Forward);
-                var stringComparison = StringComparison.CurrentCultureIgnoreCase;
-                var indexInRun = textRun.IndexOf(input, stringComparison);
-
-                if (indexInRun >= 0)
-                {
-                    position = position.GetPositionAtOffset(indexInRun);
-                    var nextPointer = position.GetPositionAtOffset(input.Length);
-                    textRange = new TextRange(position, nextPointer);
-
-                    // If a none-WholeWord match is found, directly terminate the loop.
-                    position = position.GetPositionAtOffset(input.Length);
-                    break;
-                }
-
-                // If a match is not found, go over to the next context position after the "textRun".
-                position = position.GetPositionAtOffset(textRun.Length);
-            }
-            else
-            {
-                //If the current position doesn't represent a text context position, go to the next context position.
-                // This can effectively ignore the formatting or embed element symbols.
-                position = position.GetNextContextPosition(LogicalDirection.Forward);
-            }
-        }
-
-        return textRange;
-    }
+    private int lastFindStart = -1;
+    private int lastFindLength;
 
     public void FindAndScroll()
     {
-        var position = GetTextRangeFromPosition(FumenContent.CaretPosition, InputText.Text);
-        if (position == null)
+        var docText = GetRawFumenText();
+        var input = InputText.Text;
+        if (string.IsNullOrEmpty(input))
         {
             isReplaceConformed = false;
             return;
         }
 
-        FumenContent.Selection.Select(position.Start, position.End);
-        lastFindPosition = FumenContent.Selection;
+        var startIndex = FumenContent.CaretOffset;
+        var foundIndex = docText.IndexOf(input, Math.Min(startIndex, docText.Length),
+            StringComparison.CurrentCultureIgnoreCase);
+
+        if (foundIndex < 0)
+        {
+            foundIndex = docText.IndexOf(input, 0, StringComparison.CurrentCultureIgnoreCase);
+            if (foundIndex < 0)
+            {
+                isReplaceConformed = false;
+                return;
+            }
+        }
+
+        FumenContent.Select(foundIndex, input.Length);
+        lastFindStart = foundIndex;
+        lastFindLength = input.Length;
         FumenContent.Focus();
         isReplaceConformed = true;
     }
@@ -400,7 +362,7 @@ public partial class MainWindow : Window
 
         // clear data
         soundSetting?.Close();
-        FumenContent.Document.Blocks.Clear();
+        FumenContent.Document.Text = "";
         SimaiProcess.ClearData();
         LevelSelector.SelectedIndex = -1;
         // suppress SelectionChanged from firing during clear
@@ -630,8 +592,8 @@ public partial class MainWindow : Window
     private void AddGesture(string keyGusture, string command)
     {
         var gesture = (InputGesture) new KeyGestureConverter().ConvertFromString(keyGusture)!;
-        var inputBinding = new InputBinding((ICommand)FumenContent.Resources[command], gesture);
-        FumenContent.InputBindings.Add(inputBinding);
+        var inputBinding = new InputBinding((ICommand)Resources[command], gesture);
+        InputBindings.Add(inputBinding);
     }
 
     // This update very freqently to Draw FFT wave.
@@ -1473,19 +1435,7 @@ public partial class MainWindow : Window
     private void SwitchFumenOverwriteMode()
     {
         fumenOverwriteMode = !fumenOverwriteMode;
-
-        //修改覆盖模式启用状态
-        // fetch TextEditor from FumenContent
-        var textEditorProperty =
-            typeof(TextBox).GetProperty("TextEditor", BindingFlags.NonPublic | BindingFlags.Instance);
-        var textEditor = textEditorProperty!.GetValue(FumenContent, null);
-
-        // set _OvertypeMode on the TextEditor
-        var overtypeModeProperty = textEditor!.GetType()
-            .GetProperty("_OvertypeMode", BindingFlags.NonPublic | BindingFlags.Instance)!;
-        overtypeModeProperty!.SetValue(textEditor, fumenOverwriteMode, null);
-
-        //修改提示弹窗可见性
+        FumenContent.TextArea.OverstrikeMode = fumenOverwriteMode;
         OverrideModeTipsPopup.Visibility = fumenOverwriteMode ? Visibility.Visible : Visibility.Collapsed;
     }
 
