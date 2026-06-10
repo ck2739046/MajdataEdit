@@ -37,7 +37,7 @@
     <ItemGroup>
         <PackageReference Include="AvalonEdit" Version="6.3.1.120" />
         <PackageReference Include="radio42.Bass.Net.core" Version="2.4.17.5" />
-        <PackageReference Include="DiscordRichPresence" Version="1.2.1.24" />
+        <!-- <PackageReference Include="DiscordRichPresence" Version="1.2.1.24" /> -->
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="TagLibSharp" Version="2.3.0" />
         <PackageReference Include="WPFLocalizeExtension" Version="3.10.0" />

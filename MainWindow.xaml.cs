@@ -10,7 +10,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
-using DiscordRPC.Logging;
+// using DiscordRPC.Logging;
 using MajdataEdit.AutoSaveModule;
 using Microsoft.Win32;
 using Newtonsoft.Json;

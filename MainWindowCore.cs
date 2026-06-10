@@ -13,7 +13,7 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using DiscordRPC;
+// using DiscordRPC;
 using MajdataEdit.AutoSaveModule;
 using Microsoft.Win32;
 using Newtonsoft.Json;
@@ -48,7 +48,7 @@ public partial class MainWindow : Window
     public Timer chartChangeTimer = new(1000); // 谱面变更延迟解析]\
     private readonly Timer currentTimeRefreshTimer = new(100);
 
-    public DiscordRpcClient DCRPCclient = new("1068882546932326481");
+    // public DiscordRpcClient DCRPCclient = new("1068882546932326481");
 
     private float deltatime = 4f;
     public EditorSetting? editorSetting;
