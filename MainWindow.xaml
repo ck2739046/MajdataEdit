@@ -130,14 +130,16 @@
                   Click="FollowPlayCheck_Click" Background="{DynamicResource ButtonsBackground}"
                   Template="{DynamicResource DarkCheck}" />
         <avalonEdit:TextEditor x:Name="FumenContent"
-                     Padding="0,5" FontFamily="Consolas"
+                     Padding="8,8" FontFamily="Consolas" FontSize="16"
                      Foreground="#FFE8E8E8"
-                     Margin="105,30,10,91" HorizontalScrollBarVisibility="Auto"
-                     VerticalScrollBarVisibility="Visible"
+                     Margin="105,30,10,91" HorizontalScrollBarVisibility="Hidden"
+                     VerticalScrollBarVisibility="Hidden"
+                     ShowLineNumbers="True"
+                     WordWrap="True"
                      Grid.ColumnSpan="2"
                      PreviewKeyDown="FumenContent_OnPreviewKeyDown">
             <avalonEdit:TextEditor.Background>
-                <SolidColorBrush Color="#FF171717" Opacity="0.3" />
+                <SolidColorBrush Color="#FF1E1E1E" Opacity="0.75" />
             </avalonEdit:TextEditor.Background>
         </avalonEdit:TextEditor>
         <Label x:Name="TimeLabel" Content="0:00" HorizontalAlignment="Left" Height="64" Margin="0,17,0,0"

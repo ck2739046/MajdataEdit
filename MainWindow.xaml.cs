@@ -83,6 +83,8 @@ public partial class MainWindow : Window
 
         // 注册 Simai 语法高亮着色器（AvalonEdit 渲染层着色，不影响文字模型）
         FumenContent.TextArea.TextView.LineTransformers.Add(new SimaiColorizer());
+        // 注册多倍行距生成器
+        FumenContent.TextArea.TextView.ElementGenerators.Add(new LineSpacingGenerator(1.6));
         // 钩子 AvalonEdit 事件
         FumenContent.TextArea.Caret.PositionChanged += FumenContent_SelectionChanged;
         FumenContent.Document.TextChanged += FumenContent_TextChanged;

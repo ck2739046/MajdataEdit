@@ -1,2 +1,2 @@
 dotnet build -c Release
-pause
+if errorlevel 1 pause
