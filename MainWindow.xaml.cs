@@ -359,7 +359,7 @@ public partial class MainWindow : Window
 
     private void MenuItem_GitHub_Click(object? sender, RoutedEventArgs e)
     {
-        Process.Start(new ProcessStartInfo() { FileName = "https://github.com/LingFeng-bbben/MajdataView", UseShellExecute = true });
+        Process.Start(new ProcessStartInfo() { FileName = "https://github.com/ck2739046/MajdataEdit/tree/v4.3.1", UseShellExecute = true });
     }
 
     private void MenuItem_SoundSetting_Click(object? sender, RoutedEventArgs e)
