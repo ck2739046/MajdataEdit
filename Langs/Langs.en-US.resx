@@ -208,7 +208,7 @@
     <value>SetDesigner</value>
   </data>
   <data name="Setting" xml:space="preserve">
-    <value>Setting</value>
+    <value>Settings</value>
   </data>
   <data name="SetTitle" xml:space="preserve">
     <value>SetTitle</value>
@@ -350,7 +350,7 @@ Insert key to switch back to normal mode.</value>
     <value>Touch Speed</value>
   </data>
   <data name="SpeedSettingTooltip" xml:space="preserve">
-    <value>For advanced settings, go to "Setting-&gt;Editor Setting".</value>
+    <value>For advanced settings, go to "Settings-&gt;Editor Settings".</value>
   </data>
   <data name="RenderMode" xml:space="preserve">
     <value>Rendering Mode</value>
@@ -482,10 +482,10 @@ Click OK to start render.</value>
     <value>Rotate 180°</value>
   </data>
   <data name="SK_Mirror45" xml:space="preserve">
-    <value> Rotate 45°</value>
+    <value>Rotate 45° CW</value>
   </data>
   <data name="SK_MirrorCcw45" xml:space="preserve">
-    <value>Rotate -45°</value>
+    <value>Rotate 45° CCW</value>
   </data>
   <data name="SK_CtrlArrow" xml:space="preserve">
     <value>Move Caret &amp; Seek Audio</value>

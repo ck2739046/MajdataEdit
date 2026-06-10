@@ -166,10 +166,10 @@
     <value>Rotate 180°</value>
   </data>
   <data name="SK_Mirror45" xml:space="preserve">
-    <value> Rotate 45°</value>
+    <value>Rotate 45° CW</value>
   </data>
   <data name="SK_MirrorCcw45" xml:space="preserve">
-    <value>Rotate -45°</value>
+    <value>Rotate 45° CCW</value>
   </data>
   <data name="SK_CtrlArrow" xml:space="preserve">
     <value>Move Caret &amp; Seek Audio</value>

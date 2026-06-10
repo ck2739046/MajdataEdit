@@ -365,7 +365,7 @@ Press the Insert key to switch back to normal mode.</value>
     <value>タッチ速度</value>
   </data>
   <data name="SpeedSettingTooltip" xml:space="preserve">
-    <value>To change these settings, go to "Setting-&gt;Editor Setting".</value>
+    <value>To change these settings, go to "Settings-&gt;Editor Settings".</value>
     <comment>Translation required</comment>
   </data>
   <data name="RenderMode" xml:space="preserve">
@@ -503,13 +503,13 @@ Press the Insert key to switch back to normal mode.</value>
     <value>上下ミラー</value>
   </data>
   <data name="SK_Mirror180" xml:space="preserve">
-    <value>180° 回転</value>
+    <value>回転 180°</value>
   </data>
   <data name="SK_Mirror45" xml:space="preserve">
-    <value> 45° 回転</value>
+    <value>回転 45°（時計回り）</value>
   </data>
   <data name="SK_MirrorCcw45" xml:space="preserve">
-    <value>-45° 回転</value>
+    <value>回転 45°（反時計回り）</value>
   </data>
   <data name="SK_CtrlArrow" xml:space="preserve">
     <value>キャレット移動＆音声シーク</value>

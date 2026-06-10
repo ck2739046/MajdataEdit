@@ -471,13 +471,13 @@
     <value>上下镜像</value>
   </data>
   <data name="SK_Mirror180" xml:space="preserve">
-    <value>180° 旋转</value>
+    <value>旋转 180°</value>
   </data>
   <data name="SK_Mirror45" xml:space="preserve">
-    <value> 45° 旋转</value>
+    <value>旋转 45° (顺时针)</value>
   </data>
   <data name="SK_MirrorCcw45" xml:space="preserve">
-    <value>-45° 旋转</value>
+    <value>旋转 45° (逆时针)</value>
   </data>
   <data name="SK_CtrlArrow" xml:space="preserve">
     <value>移动光标并定位音频</value>
