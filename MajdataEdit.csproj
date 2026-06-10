@@ -6,11 +6,21 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <UseWPF>true</UseWPF>
 
+        <!-- Version 会自动填充 AssemblyVersion(产品版本) 和 FileVersion(文件版本) -->
         <Version>4.3.1</Version>
-        <Company></Company>
-        <Authors>bbben</Authors>
-        <PackageProjectUrl>https://github.com/LingFeng-bbben/MajdataEdit</PackageProjectUrl>
-        <Copyright>Copyright © 2021</Copyright>
+        <!-- 禁用 SourceLink 避免 commit hash 附加到产品版本 -->
+        <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+
+        <!-- Windows 文件属性 → 文件说明 -->
+        <AssemblyTitle>MajdataEdit</AssemblyTitle>
+        <!-- Windows 文件属性 → 产品名称 -->
+        <Product>MajdataEdit</Product>
+        <!-- 输出文件名 -->
+        <AssemblyName>MajdataEdit</AssemblyName>
+
+        <Company>https://github.com/ck2739046/MajdataEdit/tree/v4.3.1</Company>
+        <Authors>bbben &amp; Simon273</Authors>
+        <Copyright>©bbben &amp; Simon273 $([System.DateTime]::Now.ToString("yyyy.MM.dd_HH:mm:ss_UTCzzz"))</Copyright>
         <ApplicationIcon>favicon.ico</ApplicationIcon>
         <UseApplicationTrust>false</UseApplicationTrust>
         <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
