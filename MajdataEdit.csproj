@@ -12,13 +12,10 @@
         <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
 
         <!-- Windows 文件属性 → 文件说明 -->
-        <AssemblyTitle>MajdataEdit</AssemblyTitle>
+        <AssemblyTitle>https://github.com/ck2739046/MajdataEdit/tree/v4.3.1</AssemblyTitle>
         <!-- Windows 文件属性 → 产品名称 -->
         <Product>MajdataEdit</Product>
-        <!-- 输出文件名 -->
-        <AssemblyName>MajdataEdit</AssemblyName>
 
-        <Company>https://github.com/ck2739046/MajdataEdit/tree/v4.3.1</Company>
         <Authors>bbben &amp; Simon273</Authors>
         <Copyright>©bbben &amp; Simon273 $([System.DateTime]::Now.ToString("yyyy.MM.dd_HH:mm:ss_UTCzzz"))</Copyright>
         <ApplicationIcon>favicon.ico</ApplicationIcon>
@@ -72,4 +69,13 @@
       <Resource Include="Image\outline_find_replace_white_24dp.png" />
       <Resource Include="Image\outline_search_white_24dp.png" />
     </ItemGroup>
+
+    <!-- Post-build: 清空 VERSIONINFO 原始文件名
+         (.NET SDK bug 导致默认填了 .dll)
+         # rcedit v2.0.0 — edit EXE/DLL VERSIONINFO resources on Windows
+         # Download: https://github.com/electron/rcedit/releases/tag/v2.0.0
+         # License: MIT (electron/rcedit) -->
+    <Target Name="FixOriginalFilename" AfterTargets="PostBuildEvent">
+        <Exec Command="&quot;$(ProjectDir)tools\rcedit.exe&quot; &quot;$(TargetDir)$(AssemblyName).exe&quot; --set-version-string &quot;OriginalFilename&quot; &quot;&quot;" />
+    </Target>
 </Project>
