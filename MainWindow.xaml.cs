@@ -168,13 +168,16 @@ public partial class MainWindow : Window
                 return;
             }
 
-        var process = Process.GetProcessesByName("MajdataView");
-        if (process.Length > 0)
+        if (!embed_mode)
         {
-            var result = MessageBox.Show(GetLocalizedString("AskCloseView"), GetLocalizedString("Attention"),
-                MessageBoxButton.YesNo);
-            if (result == MessageBoxResult.Yes)
-                process[0].Kill();
+            var process = Process.GetProcessesByName("MajdataView");
+            if (process.Length > 0)
+            {
+                var result = MessageBox.Show(GetLocalizedString("AskCloseView"), GetLocalizedString("Attention"),
+                    MessageBoxButton.YesNo);
+                if (result == MessageBoxResult.Yes)
+                    process[0].Kill();
+            }
         }
 
         currentTimeRefreshTimer.Stop();
