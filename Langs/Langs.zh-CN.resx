@@ -435,7 +435,7 @@
     <value>启用后，Slide轨迹会随着星星消失，而不是以判定区为单位消失</value>
   </data>
   <data name="ShortcutHelpTitle" xml:space="preserve">
-    <value>快捷键帮助</value>
+    <value>帮助</value>
   </data>
   <data name="SK_Function" xml:space="preserve">
     <value>功能</value>
@@ -490,5 +490,23 @@
   </data>
   <data name="SK_FontSize" xml:space="preserve">
     <value>调整字号</value>
+  </data>
+  <data name="SK_TabShortcuts" xml:space="preserve">
+    <value>快捷键</value>
+  </data>
+  <data name="SK_TabAbout" xml:space="preserve">
+    <value>关于</value>
+  </data>
+  <data name="SK_Version" xml:space="preserve">
+    <value>版本：</value>
+  </data>
+  <data name="SK_Author" xml:space="preserve">
+    <value>作者：</value>
+  </data>
+  <data name="SK_BuildDate" xml:space="preserve">
+    <value>编译时间：</value>
+  </data>
+  <data name="SK_Github" xml:space="preserve">
+    <value>GitHub：</value>
   </data>
 </root>

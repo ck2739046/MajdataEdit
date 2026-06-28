@@ -357,9 +357,19 @@ public partial class MainWindow : Window
         //maidata.txtの譜面書式
     }
 
-    private void MenuItem_GitHub_Click(object? sender, RoutedEventArgs e)
+    private void MenuItem_GitHub_Click(object? sender, RoutedEventArgs e) => OpenGitHub();
+
+    /// <summary>
+    /// 打开 GitHub 仓库页面。URL 取自 csproj 的 AssemblyTitle
+    /// </summary>
+    internal static void OpenGitHub()
     {
-        Process.Start(new ProcessStartInfo() { FileName = "https://github.com/ck2739046/MajdataEdit/tree/v4.3.1", UseShellExecute = true });
+        var attr = (System.Reflection.AssemblyTitleAttribute?)Attribute.GetCustomAttribute(
+            System.Reflection.Assembly.GetExecutingAssembly(),
+            typeof(System.Reflection.AssemblyTitleAttribute));
+        var url = attr?.Title;
+        if (!string.IsNullOrWhiteSpace(url))
+            Process.Start(new ProcessStartInfo() { FileName = url, UseShellExecute = true });
     }
 
     private void MenuItem_SoundSetting_Click(object? sender, RoutedEventArgs e)

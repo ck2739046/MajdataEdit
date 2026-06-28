@@ -6,63 +6,162 @@
         lex:ResxLocalizationProvider.DefaultAssembly="MajdataEdit"
         lex:ResxLocalizationProvider.DefaultDictionary="Langs"
         Background="{DynamicResource WindowBackground}"
-        Title="{lex:Loc ShortcutHelpTitle}" Height="420" Width="400" ResizeMode="NoResize"
+        Title="{lex:Loc ShortcutHelpTitle}" Height="500" Width="500" ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner" Topmost="True">
-    <ListView x:Name="ShortcutList" Margin="10" FontSize="13"
-              Foreground="{DynamicResource ButtonForeground}"
-              Background="{DynamicResource ButtonsBackground}"
-              BorderThickness="1">
-        <ListView.ItemContainerStyle>
-            <Style TargetType="ListViewItem">
-                <Setter Property="Focusable" Value="False"/>
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="ListViewItem">
-                            <Border x:Name="Bd" Background="Transparent" Padding="2,1">
-                                <GridViewRowPresenter />
+    <Window.Resources>
+        <Style x:Key="CenteredTabControl" TargetType="TabControl">
+            <Setter Property="Background" Value="{DynamicResource WindowBackground}" />
+            <Setter Property="Foreground" Value="{DynamicResource ButtonForeground}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabControl">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Border Grid.Row="0" Background="{DynamicResource WindowBackground}">
+                                <TabPanel x:Name="HeaderPanel" IsItemsHost="True"
+                                          HorizontalAlignment="Center" Margin="0,4,0,4" />
                             </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="Bd" Property="Background" Value="#15FFFFFF"/>
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-        </ListView.ItemContainerStyle>
-        <ListView.View>
-            <GridView>
-                <GridView.ColumnHeaderContainerStyle>
-                    <Style TargetType="GridViewColumnHeader">
-                        <Setter Property="Foreground" Value="#999999"/>
-                        <Setter Property="IsHitTestVisible" Value="False"/>
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="GridViewColumnHeader">
-                                    <TextBlock Text="{TemplateBinding Content}"
-                                               Foreground="{TemplateBinding Foreground}"
-                                               Margin="4,2"/>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </GridView.ColumnHeaderContainerStyle>
-                <GridViewColumn Header="{lex:Loc SK_Function}" Width="200">
-                    <GridViewColumn.CellTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Function}" />
-                        </DataTemplate>
-                    </GridViewColumn.CellTemplate>
-                </GridViewColumn>
-                <GridViewColumn Header="{lex:Loc SK_ShortcutKey}" Width="150">
-                    <GridViewColumn.CellTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Key}" />
-                        </DataTemplate>
-                    </GridViewColumn.CellTemplate>
-                </GridViewColumn>
-            </GridView>
-        </ListView.View>
-    </ListView>
+                            <ContentPresenter Grid.Row="1" ContentSource="SelectedContent" />
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="DarkTabItem" TargetType="TabItem">
+            <Setter Property="Foreground" Value="{DynamicResource ButtonForeground}" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="20,6" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border x:Name="Bd" Background="Transparent"
+                                BorderBrush="Transparent" BorderThickness="0,0,0,2"
+                                CornerRadius="4" Margin="4,0" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter ContentSource="Header"
+                                              HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#22FFFFFF" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#33FFFFFF" />
+                                <Setter TargetName="Bd" Property="BorderBrush"
+                                        Value="{DynamicResource ButtonForeground}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <TabControl Style="{StaticResource CenteredTabControl}">
+            <TabItem Header="{lex:Loc SK_TabShortcuts}" Style="{StaticResource DarkTabItem}">
+                <ListView x:Name="ShortcutList" Margin="6" FontSize="15"
+                          Foreground="{DynamicResource ButtonForeground}"
+                          Background="{DynamicResource ButtonsBackground}"
+                          BorderThickness="1">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="Focusable" Value="False"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListViewItem">
+                                        <Border x:Name="Bd" Background="Transparent" Padding="2,1">
+                                            <GridViewRowPresenter />
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Bd" Property="Background" Value="#15FFFFFF"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <ListView.View>
+                        <GridView>
+                            <GridView.ColumnHeaderContainerStyle>
+                                <Style TargetType="GridViewColumnHeader">
+                                    <Setter Property="Foreground" Value="#999999"/>
+                                    <Setter Property="IsHitTestVisible" Value="False"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="GridViewColumnHeader">
+                                                <TextBlock Text="{TemplateBinding Content}"
+                                                           Foreground="{TemplateBinding Foreground}"
+                                                           Margin="4,2"/>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </GridView.ColumnHeaderContainerStyle>
+                            <GridViewColumn Header="{lex:Loc SK_Function}" Width="270">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Function}" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="{lex:Loc SK_ShortcutKey}" Width="190">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Key}" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </TabItem>
+            <TabItem Header="{lex:Loc SK_TabAbout}" Style="{StaticResource DarkTabItem}">
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Margin="20,0">
+                    <Image Source="pack://application:,,,/favicon.ico" Width="72" Height="72"
+                           HorizontalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality"/>
+                    <TextBlock x:Name="AppNameText" Text="MajdataEdit" FontSize="22" FontWeight="Bold"
+                               HorizontalAlignment="Center" Margin="0,12,0,0"
+                               Foreground="{DynamicResource ButtonForeground}"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,14,0,0">
+                        <TextBlock Text="{lex:Loc SK_Version}" Foreground="{DynamicResource ButtonForeground}"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock x:Name="VersionText" Text="v0.0.0" Margin="6,0,0,0"
+                                   Foreground="{DynamicResource ButtonForeground}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,0">
+                        <TextBlock Text="{lex:Loc SK_Author}" Foreground="{DynamicResource ButtonForeground}"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock Text="bbben &amp; Simon273" Margin="6,0,0,0"
+                                   Foreground="{DynamicResource ButtonForeground}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,0">
+                        <TextBlock Text="{lex:Loc SK_BuildDate}" Foreground="{DynamicResource ButtonForeground}"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock x:Name="BuildDateText" Text="-" Margin="6,0,0,0"
+                                   Foreground="{DynamicResource ButtonForeground}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,0">
+                        <TextBlock Text="{lex:Loc SK_Github}" Foreground="{DynamicResource ButtonForeground}"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock x:Name="GithubLink" Text="" Margin="6,0,0,0" TextAlignment="Center"
+                                   Foreground="{DynamicResource HelperForeground}" VerticalAlignment="Center"
+                                   Cursor="Hand" MouseDown="GithubLink_MouseDown">
+                            <TextBlock.TextDecorations>
+                                <TextDecoration Location="Underline" />
+                            </TextBlock.TextDecorations>
+                        </TextBlock>
+                    </StackPanel>
+                </StackPanel>
+            </TabItem>
+        </TabControl>
+    </Grid>
 </Window>

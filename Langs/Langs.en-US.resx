@@ -443,7 +443,7 @@ Click OK to start render.</value>
     <value>When enabled, the Slide Track will disappear with the star instead of one judgment area after another.</value>
   </data>
   <data name="ShortcutHelpTitle" xml:space="preserve">
-    <value>Shortcut Help</value>
+    <value>Help</value>
   </data>
   <data name="SK_Function" xml:space="preserve">
     <value>Function</value>
@@ -498,5 +498,23 @@ Click OK to start render.</value>
   </data>
   <data name="SK_FontSize" xml:space="preserve">
     <value>Adjust Font Size</value>
+  </data>
+  <data name="SK_TabShortcuts" xml:space="preserve">
+    <value>Shortcuts</value>
+  </data>
+  <data name="SK_TabAbout" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="SK_Version" xml:space="preserve">
+    <value>Version: </value>
+  </data>
+  <data name="SK_Author" xml:space="preserve">
+    <value>Author: </value>
+  </data>
+  <data name="SK_BuildDate" xml:space="preserve">
+    <value>Build Date: </value>
+  </data>
+  <data name="SK_Github" xml:space="preserve">
+    <value>GitHub: </value>
   </data>
 </root>

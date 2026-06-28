@@ -100,7 +100,6 @@
                 <MenuItem Header="{lex:Loc RemapViewer}" Click="Menu_ResetViewWindow" />
                 <Separator />
                 <MenuItem Header="Majnet" Click="MenuItem_Majnet_Click" />
-                <MenuItem Header="{lex:Loc Github}" Click="MenuItem_GitHub_Click" />
             </MenuItem>
             <MenuItem Header="{lex:Loc Tools}" Foreground="{DynamicResource ButtonForeground}"
                       Template="{DynamicResource DarkMenuItem}">

@@ -68,6 +68,7 @@
       <Resource Include="Image\bg_dummy.jpg" />
       <Resource Include="Image\outline_find_replace_white_24dp.png" />
       <Resource Include="Image\outline_search_white_24dp.png" />
+      <Resource Include="favicon.ico" />
     </ItemGroup>
 
     <!-- Post-build: 清空 VERSIONINFO 原始文件名

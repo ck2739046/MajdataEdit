@@ -467,7 +467,7 @@ Press the Insert key to switch back to normal mode.</value>
     <comment>Translation required</comment>
   </data>
   <data name="ShortcutHelpTitle" xml:space="preserve">
-    <value>ショートカット一覧</value>
+    <value>ヘルプ</value>
   </data>
   <data name="SK_Function" xml:space="preserve">
     <value>機能</value>
@@ -522,5 +522,23 @@ Press the Insert key to switch back to normal mode.</value>
   </data>
   <data name="SK_FontSize" xml:space="preserve">
     <value>フォントサイズ調整</value>
+  </data>
+  <data name="SK_TabShortcuts" xml:space="preserve">
+    <value>ショートカット</value>
+  </data>
+  <data name="SK_TabAbout" xml:space="preserve">
+    <value>バージョン情報</value>
+  </data>
+  <data name="SK_Version" xml:space="preserve">
+    <value>バージョン：</value>
+  </data>
+  <data name="SK_Author" xml:space="preserve">
+    <value>作者：</value>
+  </data>
+  <data name="SK_BuildDate" xml:space="preserve">
+    <value>ビルド日時：</value>
+  </data>
+  <data name="SK_Github" xml:space="preserve">
+    <value>GitHub：</value>
   </data>
 </root>

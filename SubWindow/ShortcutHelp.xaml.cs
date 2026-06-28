@@ -1,5 +1,8 @@
 using System.Collections.Generic;
+using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Input;
 using WPFLocalizeExtension.Extensions;
 
 namespace MajdataEdit;
@@ -27,6 +30,51 @@ public partial class ShortcutHelp : Window
             Make("SK_CtrlClick", "SK_CtrlClick_Key", true),
             Make("SK_FontSize", "Ctrl + +/-"),
         };
+        FillAboutInfo();
+    }
+
+    /// <summary>
+    /// 反射读取程序集版本与编译时间戳(嵌入在 AssemblyCopyright 内)填充「关于」面板。
+    /// </summary>
+    private void FillAboutInfo()
+    {
+        var asm = Assembly.GetExecutingAssembly();
+        var ver = asm.GetName().Version;
+        VersionText.Text = ver != null ? $"v{ver.ToString(3)}" : "v0.0.0";
+
+        var copyright = asm.GetCustomAttribute<AssemblyCopyrightAttribute>()?.Copyright;
+        BuildDateText.Text = ExtractBuildDate(copyright) ?? "-";
+
+        // GitHub 完整 URL 取自 csproj 的 <AssemblyTitle>,显示与点击打开保持一致
+        var title = asm.GetCustomAttribute<AssemblyTitleAttribute>()?.Title;
+        if (!string.IsNullOrWhiteSpace(title))
+            GithubLink.Text = title;
+    }
+
+    /// <summary>
+    /// 从 Copyright 字符串中解析构建时间戳。
+    /// csproj: ©bbben &amp; Simon273 yyyy.MM.dd_HH:mm:ss_UTCzzz
+    /// </summary>
+    private static string? ExtractBuildDate(string? copyright)
+    {
+        if (string.IsNullOrWhiteSpace(copyright))
+            return null;
+        // 形如 2026.06.28_14:30:00_UTC+08:00
+        var match = Regex.Match(copyright,
+            @"(\d{4}\.\d{2}\.\d{2}_\d{2}:\d{2}:\d{2}_UTC[+\-]\d{2}:\d{2})");
+        if (!match.Success)
+            return copyright;
+        // 将 2026.06.28_14:30:00_UTC+08:00 美化为 2026.06.28 14:30:00 (UTC+08:00)
+        var raw = match.Groups[1].Value;
+        var parts = raw.Split('_');
+        if (parts.Length == 3)
+            return $"{parts[0]} {parts[1]} ({parts[2]})";
+        return raw;
+    }
+
+    private void GithubLink_MouseDown(object sender, MouseButtonEventArgs e)
+    {
+        MainWindow.OpenGitHub();
     }
 
     private static ShortcutItem Make(string locKey, string key, bool localizeKey = false)
