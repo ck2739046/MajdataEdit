@@ -434,7 +434,7 @@
   <data name="SmoothSlideAnimeTooltip" xml:space="preserve">
     <value>启用后，Slide轨迹会随着星星消失，而不是以判定区为单位消失</value>
   </data>
-  <data name="ShortcutHelpTitle" xml:space="preserve">
+  <data name="HelpTitle" xml:space="preserve">
     <value>帮助</value>
   </data>
   <data name="SK_Function" xml:space="preserve">

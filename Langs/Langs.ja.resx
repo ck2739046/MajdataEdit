@@ -466,7 +466,7 @@ Press the Insert key to switch back to normal mode.</value>
     <value>When enabled, the Slide Track will disappear with the star instead of one judgment area after another.</value>
     <comment>Translation required</comment>
   </data>
-  <data name="ShortcutHelpTitle" xml:space="preserve">
+  <data name="HelpTitle" xml:space="preserve">
     <value>ヘルプ</value>
   </data>
   <data name="SK_Function" xml:space="preserve">

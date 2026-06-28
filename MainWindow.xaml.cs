@@ -399,9 +399,9 @@ public partial class MainWindow : Window
         esp.ShowDialog();
     }
 
-    private void MenuItem_ShortcutHelp_Click(object? sender, RoutedEventArgs e)
+    private void MenuItem_Help_Click(object? sender, RoutedEventArgs e)
     {
-        var win = new ShortcutHelp { Owner = this };
+        var win = new HelpWindow { Owner = this };
         win.ShowDialog();
     }
 

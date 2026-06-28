@@ -7,9 +7,9 @@ using WPFLocalizeExtension.Extensions;
 
 namespace MajdataEdit;
 
-public partial class ShortcutHelp : Window
+public partial class HelpWindow : Window
 {
-    public ShortcutHelp()
+    public HelpWindow()
     {
         InitializeComponent();
         ShortcutList.ItemsSource = new List<ShortcutItem>

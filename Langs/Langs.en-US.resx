@@ -442,7 +442,7 @@ Click OK to start render.</value>
   <data name="SmoothSlideAnimeTooltip" xml:space="preserve">
     <value>When enabled, the Slide Track will disappear with the star instead of one judgment area after another.</value>
   </data>
-  <data name="ShortcutHelpTitle" xml:space="preserve">
+  <data name="HelpTitle" xml:space="preserve">
     <value>Help</value>
   </data>
   <data name="SK_Function" xml:space="preserve">
