@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -8,11 +7,13 @@ namespace MajdataEdit
 {
     public class ControlFileWatcher : IDisposable
     {
+        private const int DebounceMs = 200;
+
         private readonly string _controlFileName;
         private readonly string _controlFilePath;
-        private FileSystemWatcher? _watcher;
         private readonly MainWindow _mainWindow;
         private readonly DispatcherTimer _processingTimer;
+        private FileSystemWatcher? _watcher;
         private bool _isProcessing = false;
 
         public ControlFileWatcher(MainWindow mainWindow, string controlFilePath)
@@ -20,14 +21,8 @@ namespace MajdataEdit
             _mainWindow = mainWindow;
             _controlFilePath = controlFilePath;
             _controlFileName = Path.GetFileName(controlFilePath);
-            
-            Console.WriteLine($"[ControlFileWatcher] Initialized with control file path: {_controlFilePath}");
-            
-            // Use a timer to debounce file system events
-            _processingTimer = new DispatcherTimer
-            {
-                Interval = TimeSpan.FromMilliseconds(500)
-            };
+
+            _processingTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(DebounceMs) };
             _processingTimer.Tick += ProcessingTimer_Tick;
         }
 
@@ -35,32 +30,28 @@ namespace MajdataEdit
         {
             try
             {
-                // Create watcher for the directory containing the control file
                 string? directory = Path.GetDirectoryName(_controlFilePath);
                 if (directory == null)
                 {
-                    Console.WriteLine($"[ControlFileWatcher] Error: Could not get directory from path: {_controlFilePath}");
+                    Console.WriteLine($"[ControlFileWatcher] Error: invalid control file path: {_controlFilePath}");
                     return;
                 }
-                
+
                 _watcher = new FileSystemWatcher(directory)
                 {
                     Filter = _controlFileName,
                     NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite | NotifyFilters.CreationTime,
                     EnableRaisingEvents = true
                 };
-
-                _watcher.Created += OnControlFileChanged;
-                _watcher.Changed += OnControlFileChanged;
-                _watcher.Renamed += OnControlFileRenamed;
+                _watcher.Created += ScheduleIfMatch;
+                _watcher.Changed += ScheduleIfMatch;
+                _watcher.Renamed += (s, e) => ScheduleIfMatch(s, e);
 
                 Console.WriteLine($"[ControlFileWatcher] Started watching for {_controlFileName}");
-                
-                // Check if file already exists
+
                 if (File.Exists(_controlFilePath))
                 {
-                    Console.WriteLine($"[ControlFileWatcher] Control file already exists, processing...");
-                    ProcessControlFile();
+                    ScheduleProcessing();
                 }
             }
             catch (Exception ex)
@@ -69,28 +60,18 @@ namespace MajdataEdit
             }
         }
 
-        private void OnControlFileChanged(object sender, FileSystemEventArgs e)
+        private void ScheduleIfMatch(object sender, FileSystemEventArgs e)
         {
             if (e.Name == _controlFileName)
             {
-                Console.WriteLine($"[ControlFileWatcher] Control file {e.ChangeType}: {e.FullPath}");
-                
-                // Debounce the processing to avoid multiple rapid triggers
-                _processingTimer.Stop();
-                _processingTimer.Start();
+                ScheduleProcessing();
             }
         }
 
-        private void OnControlFileRenamed(object sender, RenamedEventArgs e)
+        private void ScheduleProcessing()
         {
-            if (e.Name == _controlFileName)
-            {
-                Console.WriteLine($"[ControlFileWatcher] Control file renamed to: {e.Name}");
-                
-                // Debounce the processing to avoid multiple rapid triggers
-                _processingTimer.Stop();
-                _processingTimer.Start();
-            }
+            _processingTimer.Stop();
+            _processingTimer.Start();
         }
 
         private void ProcessingTimer_Tick(object? sender, EventArgs e)
@@ -103,155 +84,71 @@ namespace MajdataEdit
         {
             if (_isProcessing)
             {
-                Console.WriteLine("[ControlFileWatcher] Already processing, skipping...");
                 return;
             }
-
             _isProcessing = true;
-            
+
             try
             {
                 if (!File.Exists(_controlFilePath))
                 {
-                    Console.WriteLine($"[ControlFileWatcher] Control file not found: {_controlFilePath}");
                     _isProcessing = false;
                     return;
                 }
 
-                Console.WriteLine($"[ControlFileWatcher] Reading control file: {_controlFilePath}");
-                
-                // Read all lines from the control file
                 string[] lines = File.ReadAllLines(_controlFilePath);
-                
-                // Check for exit command (single line with "exit")
-                if (lines.Length == 1 && lines[0].Trim().ToLower() == "exit")
-                {
-                    Console.WriteLine($"[ControlFileWatcher] Received exit command");
-                    
-                    // Delete the control file to prevent repeated processing
-                    try
-                    {
-                        File.Delete(_controlFilePath);
-                        Console.WriteLine($"[ControlFileWatcher] Control file deleted: {_controlFilePath}");
-                    }
-                    catch (Exception deleteEx)
-                    {
-                        Console.WriteLine($"[ControlFileWatcher] Warning: Could not delete control file: {deleteEx.Message}");
-                    }
 
-                    // Use dispatcher to close the application on the UI thread
-                    _mainWindow.Dispatcher.BeginInvoke(() =>
-                    {
-                        try
-                        {
-                            Console.WriteLine($"[ControlFileWatcher] Closing MajdataEdit...");
-                            _mainWindow.Close();
-                            Console.WriteLine($"[ControlFileWatcher] MajdataEdit close requested");
-                        }
-                        catch (Exception closeEx)
-                        {
-                            Console.WriteLine($"[ControlFileWatcher] Error closing MajdataEdit: {closeEx.Message}");
-                        }
-                        finally
-                        {
-                            _isProcessing = false;
-                        }
-                    }, DispatcherPriority.Normal);
-                    
+                // exit command
+                if (lines.Length == 1 && lines[0].Trim().Equals("exit", StringComparison.OrdinalIgnoreCase))
+                {
+                    Console.WriteLine("[ControlFileWatcher] Received exit command");
+                    TryDeleteControlFile();
+                    RunOnUi(() => _mainWindow.Close());
                     return;
                 }
-                
+
                 if (lines.Length < 3)
                 {
-                    Console.WriteLine($"[ControlFileWatcher] Invalid control file format: expected 3 or 4 lines or single 'exit' command, got {lines.Length}");
+                    Console.WriteLine($"[ControlFileWatcher] Invalid control file: expected 3+ lines or 'exit', got {lines.Length}");
                     _isProcessing = false;
                     return;
                 }
 
-                // Parse the three required lines
-                string folderLine = lines[0].Trim();
-                string maidataLine = lines[1].Trim();
-                string trackLine = lines[2].Trim();
-
-                // Validate format
-                if (!folderLine.StartsWith("folder: ") || 
-                    !maidataLine.StartsWith("maidata: ") || 
-                    !trackLine.StartsWith("track: "))
+                string? folderPath = ParsePrefixedValue(lines[0], "folder: ");
+                string? maidataFilename = ParsePrefixedValue(lines[1], "maidata: ");
+                string? trackFilename = ParsePrefixedValue(lines[2], "track: ");
+                if (folderPath == null || maidataFilename == null || trackFilename == null)
                 {
-                    Console.WriteLine($"[ControlFileWatcher] Invalid control file format: missing required prefixes");
-                    Console.WriteLine($"  Expected: 'folder: xxx', 'maidata: xxx', 'track: xxx'");
-                    Console.WriteLine($"  Got: '{folderLine}', '{maidataLine}', '{trackLine}'");
+                    Console.WriteLine("[ControlFileWatcher] Invalid control file: missing 'folder: '/'maidata: '/'track: ' prefixes");
                     _isProcessing = false;
                     return;
                 }
 
-                // Extract values
-                string folderPath = folderLine.Substring("folder: ".Length).Trim();
-                string maidataFilename = maidataLine.Substring("maidata: ".Length).Trim();
-                string trackFilename = trackLine.Substring("track: ".Length).Trim();
                 string? movieFilename = null;
-                
-                // Parse optional movie line
                 if (lines.Length >= 4)
                 {
-                    string movieLine = lines[3].Trim();
-                    if (movieLine.StartsWith("movie: "))
+                    movieFilename = ParsePrefixedValue(lines[3], "movie: ");
+                    if (movieFilename == null)
                     {
-                        movieFilename = movieLine.Substring("movie: ".Length).Trim();
-                    }
-                    else
-                    {
-                        Console.WriteLine($"[ControlFileWatcher] Warning: Fourth line does not start with 'movie: ', ignoring");
+                        Console.WriteLine("[ControlFileWatcher] Warning: fourth line ignored (missing 'movie: ' prefix)");
                     }
                 }
 
-                Console.WriteLine($"[ControlFileWatcher] Parsed control file:");
-                Console.WriteLine($"  Folder: {folderPath}");
-                Console.WriteLine($"  Maidata: {maidataFilename}");
-                Console.WriteLine($"  Track: {trackFilename}");
-                if (movieFilename != null)
-                {
-                    Console.WriteLine($"  Movie: {movieFilename}");
-                }
-
-                // Check if all three values are "---"
+                // stop command (all three fields are "---")
                 if (folderPath == "---" && maidataFilename == "---" && trackFilename == "---")
                 {
-                    Console.WriteLine($"[ControlFileWatcher] Received stop command (all fields are '---')");
-                    
-                    // Delete the control file to prevent repeated processing
-                    try
+                    Console.WriteLine("[ControlFileWatcher] Received stop command");
+                    TryDeleteControlFile();
+                    RunOnUi(() =>
                     {
-                        File.Delete(_controlFilePath);
-                        Console.WriteLine($"[ControlFileWatcher] Control file deleted: {_controlFilePath}");
-                    }
-                    catch (Exception deleteEx)
-                    {
-                        Console.WriteLine($"[ControlFileWatcher] Warning: Could not delete control file: {deleteEx.Message}");
-                    }
-
-                    // Use dispatcher to call the main window methods on the UI thread
-                    _mainWindow.Dispatcher.BeginInvoke(() =>
-                    {
-                        try
+                        if (_mainWindow.isPlaying)
                         {
-                            if (_mainWindow.isPlaying)
-                            {
-                                _mainWindow.TogglePause();
-                                Console.WriteLine($"[ControlFileWatcher] MajdataEdit paused");
-                            }
+                            _mainWindow.TogglePause();
                         }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"[ControlFileWatcher] Error when pausing: {ex.Message}");
-                        }
-                    }, DispatcherPriority.Normal);
-                    
-                    _isProcessing = false;
+                    });
                     return;
                 }
 
-                // Validate folder exists
                 if (!Directory.Exists(folderPath))
                 {
                     Console.WriteLine($"[ControlFileWatcher] Folder does not exist: {folderPath}");
@@ -259,58 +156,70 @@ namespace MajdataEdit
                     return;
                 }
 
-                // Delete the control file to prevent repeated processing
-                try
-                {
-                    File.Delete(_controlFilePath);
-                    Console.WriteLine($"[ControlFileWatcher] Control file deleted: {_controlFilePath}");
-                }
-                catch (Exception deleteEx)
-                {
-                    Console.WriteLine($"[ControlFileWatcher] Warning: Could not delete control file: {deleteEx.Message}");
-                }
-
-                // Load the data using the main window's method
                 Console.WriteLine($"[ControlFileWatcher] Loading data from folder: {folderPath}");
-                
-                // Use dispatcher to call the main window method on the UI thread
-                _mainWindow.Dispatcher.BeginInvoke(() =>
+                TryDeleteControlFile();
+
+                RunOnUi(() =>
                 {
-                    try
+                    if (!_mainWindow.IsSaved)
                     {
-                        // Check if there are unsaved changes
-                        if (!_mainWindow.IsSaved)
+                        var result = MessageBox.Show(
+                            MainWindow.GetLocalizedString("AskSave"),
+                            MainWindow.GetLocalizedString("Warning"),
+                            MessageBoxButton.YesNo);
+                        if (result == MessageBoxResult.Yes)
                         {
-                            var result = MessageBox.Show(
-                                MainWindow.GetLocalizedString("AskSave"),
-                                MainWindow.GetLocalizedString("Warning"),
-                                MessageBoxButton.YesNo);
-                            
-                            if (result == MessageBoxResult.Yes)
-                            {
-                                _mainWindow.SaveFumen(true);
-                            }
-                            // If result is No, continue without saving
+                            _mainWindow.SaveFumen(true);
                         }
-                        
-                        _mainWindow.initFromFile(folderPath, maidataFilename, trackFilename, movieFilename);
-                        Console.WriteLine($"[ControlFileWatcher] Successfully loaded data from {folderPath}");
                     }
-                    catch (Exception loadEx)
-                    {
-                        Console.WriteLine($"[ControlFileWatcher] Error loading data: {loadEx.Message}");
-                    }
-                    finally
-                    {
-                        _isProcessing = false;
-                    }
-                }, DispatcherPriority.Normal);
+                    _mainWindow.initFromFile(folderPath, maidataFilename, trackFilename, movieFilename);
+                    Console.WriteLine($"[ControlFileWatcher] Successfully loaded data from {folderPath}");
+                });
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"[ControlFileWatcher] Error processing control file: {ex.Message}");
                 _isProcessing = false;
             }
+        }
+
+        private static string? ParsePrefixedValue(string line, string prefix)
+        {
+            string trimmed = line.Trim();
+            return trimmed.StartsWith(prefix) ? trimmed.Substring(prefix.Length).Trim() : null;
+        }
+
+        private bool TryDeleteControlFile()
+        {
+            try
+            {
+                File.Delete(_controlFilePath);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ControlFileWatcher] Warning: could not delete control file: {ex.Message}");
+                return false;
+            }
+        }
+
+        private void RunOnUi(Action action)
+        {
+            _mainWindow.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                try
+                {
+                    action();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[ControlFileWatcher] Error in UI action: {ex.Message}");
+                }
+                finally
+                {
+                    _isProcessing = false;
+                }
+            }), DispatcherPriority.Normal);
         }
 
         public void StopWatching()
@@ -320,10 +229,9 @@ namespace MajdataEdit
                 _watcher.EnableRaisingEvents = false;
                 _watcher.Dispose();
                 _watcher = null;
-                Console.WriteLine($"[ControlFileWatcher] Stopped watching for {_controlFileName}");
             }
-            
             _processingTimer.Stop();
+            _isProcessing = false;
         }
 
         public void Dispose()
