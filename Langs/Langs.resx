@@ -180,4 +180,7 @@
   <data name="SK_CtrlClick_Key" xml:space="preserve">
     <value>Ctrl + Left Click</value>
   </data>
+  <data name="SK_FontSize" xml:space="preserve">
+    <value>Adjust Font Size</value>
+  </data>
 </root>

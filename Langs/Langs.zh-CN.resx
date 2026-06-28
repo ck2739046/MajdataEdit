@@ -488,4 +488,7 @@
   <data name="SK_CtrlClick_Key" xml:space="preserve">
     <value>Ctrl + 左键点击</value>
   </data>
+  <data name="SK_FontSize" xml:space="preserve">
+    <value>调整字号</value>
+  </data>
 </root>

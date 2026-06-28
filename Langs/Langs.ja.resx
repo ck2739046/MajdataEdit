@@ -520,4 +520,7 @@ Press the Insert key to switch back to normal mode.</value>
   <data name="SK_CtrlClick_Key" xml:space="preserve">
     <value>Ctrl + 左クリック</value>
   </data>
+  <data name="SK_FontSize" xml:space="preserve">
+    <value>フォントサイズ調整</value>
+  </data>
 </root>

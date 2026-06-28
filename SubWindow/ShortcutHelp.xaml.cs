@@ -25,6 +25,7 @@ public partial class ShortcutHelp : Window
             Make("SK_MirrorCcw45", "Ctrl + '"),
             Make("SK_CtrlArrow", "Ctrl + ↑/↓/←/→"),
             Make("SK_CtrlClick", "SK_CtrlClick_Key", true),
+            Make("SK_FontSize", "Ctrl + +/-"),
         };
     }
 
