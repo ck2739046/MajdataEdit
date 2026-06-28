@@ -98,7 +98,7 @@ namespace MajdataEdit
 
                 string[] lines = File.ReadAllLines(_controlFilePath);
 
-                // exit command
+                // exit 合法情形一：整文件仅有一行 "exit"
                 if (lines.Length == 1 && lines[0].Trim().Equals("exit", StringComparison.OrdinalIgnoreCase))
                 {
                     Console.WriteLine("[ControlFileWatcher] Received exit command");
@@ -107,9 +107,17 @@ namespace MajdataEdit
                     return;
                 }
 
-                if (lines.Length < 3)
+                // 其余情况必须为结构化指令（首行带 "folder: " 前缀），否则非法
+                if (lines.Length < 1 || ParsePrefixedValue(lines[0], "folder: ") == null)
                 {
                     Console.WriteLine($"[ControlFileWatcher] Invalid control file: expected 3+ lines or 'exit', got {lines.Length}");
+                    _isProcessing = false;
+                    return;
+                }
+
+                if (lines.Length < 3)
+                {
+                    Console.WriteLine($"[ControlFileWatcher] Invalid control file: expected 3+ lines, got {lines.Length}");
                     _isProcessing = false;
                     return;
                 }
@@ -124,6 +132,7 @@ namespace MajdataEdit
                     return;
                 }
 
+                // 可选的 movie 行（第 4 行）
                 string? movieFilename = null;
                 if (lines.Length >= 4)
                 {
@@ -137,13 +146,33 @@ namespace MajdataEdit
                 // stop command (all three fields are "---")
                 if (folderPath == "---" && maidataFilename == "---" && trackFilename == "---")
                 {
+                    // exit 合法情形二：出现在 stop 三行之后、可选 movie 行之后的位置
+                    bool wantsExit = false;
+                    if (lines.Length >= 4)
+                    {
+                        int exitIdx = movieFilename != null ? 4 : 3;
+                        if (exitIdx < lines.Length
+                            && lines[exitIdx].Trim().Equals("exit", StringComparison.OrdinalIgnoreCase))
+                        {
+                            wantsExit = true;
+                        }
+                    }
+
                     Console.WriteLine("[ControlFileWatcher] Received stop command");
+                    if (wantsExit)
+                    {
+                        Console.WriteLine("[ControlFileWatcher] Combined with exit: pause then close");
+                    }
                     TryDeleteControlFile();
                     RunOnUi(() =>
                     {
                         if (_mainWindow.isPlaying)
                         {
                             _mainWindow.TogglePause();
+                        }
+                        if (wantsExit)
+                        {
+                            _mainWindow.Close();
                         }
                     });
                     return;
