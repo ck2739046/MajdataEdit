@@ -103,7 +103,11 @@ namespace MajdataEdit
                 {
                     Console.WriteLine("[ControlFileWatcher] Received exit command");
                     TryDeleteControlFile();
-                    RunOnUi(() => _mainWindow.Close());
+                    RunOnUi(() =>
+                    {
+                        _mainWindow.IsExitFromControlFile = true;
+                        _mainWindow.Close();
+                    });
                     return;
                 }
 
@@ -172,6 +176,7 @@ namespace MajdataEdit
                         }
                         if (wantsExit)
                         {
+                            _mainWindow.IsExitFromControlFile = true;
                             _mainWindow.Close();
                         }
                     });

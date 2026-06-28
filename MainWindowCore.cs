@@ -43,6 +43,12 @@ public partial class MainWindow : Window
     public static string? currentMovieFilename = null;
     private ControlFileWatcher? _controlFileWatcher;
 
+    /// <summary>
+    ///     When true, the close was requested via control file.
+    ///     AskSave() will use YesNo instead of YesNoCancel to prevent blocking the external caller indefinitely.
+    /// </summary>
+    public bool IsExitFromControlFile { get; set; }
+
     //float[] wavedBs;
     private readonly short[][] waveRaws = new short[3][];
     public Timer chartChangeTimer = new(1000); // 谱面变更延迟解析]\
@@ -426,8 +432,11 @@ public partial class MainWindow : Window
     /// <returns>Return false if user cancel the action</returns>
     private bool AskSave()
     {
+        var buttons = IsExitFromControlFile ? MessageBoxButton.YesNo : MessageBoxButton.YesNoCancel;
+        
         var result = MessageBox.Show(GetLocalizedString("AskSave"), GetLocalizedString("Warning"),
-            MessageBoxButton.YesNoCancel);
+            buttons);
+
         if (result == MessageBoxResult.Yes)
         {
             SaveFumen(true);
