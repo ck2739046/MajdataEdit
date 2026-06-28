@@ -670,6 +670,23 @@ public partial class MainWindow : Window
             return;
         }
 
+        // Ctrl + +/-（含主键盘 = 与数字小键盘）调整编辑器字号，并持久化到设置文件
+        if (mod == ModifierKeys.Control
+            && (e.Key == Key.OemPlus || e.Key == Key.Add
+                || e.Key == Key.OemMinus || e.Key == Key.Subtract))
+        {
+            const double MinFont = 6;
+            const double MaxFont = 64;
+            if (e.Key == Key.OemPlus || e.Key == Key.Add)
+                FumenContent.FontSize = Math.Min(MaxFont, FumenContent.FontSize + 1);
+            else
+                FumenContent.FontSize = Math.Max(MinFont, FumenContent.FontSize - 1);
+            editorSetting!.FontSize = (float)FumenContent.FontSize;
+            SaveEditorSetting();
+            e.Handled = true;
+            return;
+        }
+
         // 按下Insert键，同时未按下任何组合键，切换覆盖模式
         if (e.Key == Key.Insert && mod == ModifierKeys.None)
         {
