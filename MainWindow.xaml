@@ -132,11 +132,76 @@
                      Padding="8,8" FontFamily="Consolas" FontSize="16"
                      Foreground="#FFE8E8E8"
                      Margin="105,30,10,91" HorizontalScrollBarVisibility="Hidden"
-                     VerticalScrollBarVisibility="Hidden"
+                     VerticalScrollBarVisibility="Auto"
                      ShowLineNumbers="True"
                      WordWrap="True"
                      Grid.ColumnSpan="2"
                      PreviewKeyDown="FumenContent_OnPreviewKeyDown">
+            <avalonEdit:TextEditor.Resources>
+                <!-- Dark, narrow scrollbar style (matches Bpm-Measurer BPM segment scrollbar). -->
+                <Style TargetType="ScrollBar">
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="Width" Value="10"/>
+                    <Setter Property="MinWidth" Value="10"/>
+                    <Setter Property="Margin" Value="4,0,4,0"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ScrollBar">
+                                <Border Background="Transparent">
+                                    <Track x:Name="PART_Track" IsDirectionReversed="True">
+                                        <Track.DecreaseRepeatButton>
+                                            <RepeatButton Command="ScrollBar.PageUpCommand">
+                                                <RepeatButton.Template>
+                                                    <ControlTemplate TargetType="RepeatButton">
+                                                        <Border Background="Transparent"/>
+                                                    </ControlTemplate>
+                                                </RepeatButton.Template>
+                                            </RepeatButton>
+                                        </Track.DecreaseRepeatButton>
+                                        <Track.Thumb>
+                                            <Thumb>
+                                                <Thumb.Template>
+                                                    <ControlTemplate TargetType="Thumb">
+                                                        <Border x:Name="ThumbFill"
+                                                                Background="#6A6A6A"
+                                                                CornerRadius="5"
+                                                                Margin="1"/>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter TargetName="ThumbFill" Property="Background" Value="#9A9A9A"/>
+                                                            </Trigger>
+                                                            <Trigger Property="IsDragging" Value="True">
+                                                                <Setter TargetName="ThumbFill" Property="Background" Value="#FF818CF8"/>
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Thumb.Template>
+                                            </Thumb>
+                                        </Track.Thumb>
+                                        <Track.IncreaseRepeatButton>
+                                            <RepeatButton Command="ScrollBar.PageDownCommand">
+                                                <RepeatButton.Template>
+                                                    <ControlTemplate TargetType="RepeatButton">
+                                                        <Border Background="Transparent"/>
+                                                    </ControlTemplate>
+                                                </RepeatButton.Template>
+                                            </RepeatButton>
+                                        </Track.IncreaseRepeatButton>
+                                    </Track>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="Orientation" Value="Horizontal">
+                                        <Setter Property="Width" Value="Auto"/>
+                                        <Setter Property="Height" Value="10"/>
+                                        <Setter Property="MinWidth" Value="0"/>
+                                        <Setter Property="MinHeight" Value="10"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </avalonEdit:TextEditor.Resources>
             <avalonEdit:TextEditor.Background>
                 <SolidColorBrush Color="#FF1E1E1E" Opacity="0.75" />
             </avalonEdit:TextEditor.Background>
