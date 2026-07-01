@@ -182,24 +182,43 @@ public partial class MainWindow : Window
 
         currentTimeRefreshTimer.Stop();
         visualEffectRefreshTimer.Stop();
+        waveStopMonitorTimer.Stop();
 
         soundSetting.Close();
         //if (bpmtap != null) { bpmtap.Close(); }
         //if (muriCheck != null) { muriCheck.Close(); }
         SaveSetting();
 
-        Bass.BASS_ChannelStop(bgmStream);
-        Bass.BASS_StreamFree(bgmStream);
-        Bass.BASS_ChannelStop(answerStream);
-        Bass.BASS_StreamFree(answerStream);
-        Bass.BASS_ChannelStop(breakStream);
-        Bass.BASS_StreamFree(breakStream);
-        Bass.BASS_ChannelStop(judgeExStream);
-        Bass.BASS_StreamFree(judgeExStream);
-        Bass.BASS_ChannelStop(hanabiStream);
-        Bass.BASS_StreamFree(hanabiStream);
+        // 1. 先停止播放状态，使 SE 线程退出 while(isPlaying) 循环，
+        //    避免在线程内继续访问即将被释放的 BGM 流。
+        isPlaying = false;
+        // 2. 统一释放 BGM 三层资源（bgmStream + bgmSourceStream + pinned GCHandle）。
+        FreeBgmStream();
+        // 3. 显式释放全部音效流，保证句柄不残留（BASS_Free() 会兜底，但显式释放更安全）。
+        foreach (var s in new[]
+                 {
+                     answerStream, judgeStream, judgeBreakStream, judgeExStream,
+                     breakStream, breakSlideStream, breakSlideStartStream, judgeBreakSlideStream,
+                     slideStream, touchStream, holdRiserStream, allperfectStream,
+                     fanfareStream, clockStream, trackStartStream, hanabiStream
+                 })
+        {
+            if (s > 0)
+            {
+                Bass.BASS_ChannelStop(s);
+                Bass.BASS_StreamFree(s);
+            }
+        }
+
         Bass.BASS_Stop();
         Bass.BASS_Free();
+
+        // 4. 释放所有 System.Timers.Timer（实现了 IDisposable，仅 Stop 不够干净）。
+        currentTimeRefreshTimer.Dispose();
+        visualEffectRefreshTimer.Dispose();
+        waveStopMonitorTimer.Dispose();
+        chartChangeTimer.Dispose();
+        playbackSpeedHideTimer.Dispose();
 
         // 正常退出
         SafeTerminationDetector.Of().RecordProgramClose();

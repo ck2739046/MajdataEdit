@@ -256,15 +256,27 @@ public partial class MainWindow : Window
         maidataDir = path;
         SafeTerminationDetector.Of().ChangePath(maidataDir);
         SetRawFumenText("");
-        if (bgmStream != -1024)
-        {
-            Bass.BASS_ChannelStop(bgmStream);
-            Bass.BASS_StreamFree(bgmStream);
-        }
+        // 在加载新谱面前停止所有旧播放状态：
+        // 退出 SE 线程、停循环音效(touchHold_riser)、停刷新 timer、通知 MajdataView 停止
+        isPlaying = false;
+        isPlan2Stop = false;
+        if (holdRiserStream > 0) Bass.BASS_ChannelStop(holdRiserStream);
+        waveStopMonitorTimer.Stop();
+        visualEffectRefreshTimer.Stop();
+        sendRequestStop(silentOnFailure: true);
+        FreeBgmStream();
 
-        //soundSetting.Close();
-        var decodeStream = Bass.BASS_StreamCreateFile(audioPath, 0L, 0L, BASSFlag.BASS_STREAM_DECODE);
-        bgmStream = BassFx.BASS_FX_TempoCreate(decodeStream, BASSFlag.BASS_FX_FREESOURCE);
+        // soundSetting.Close();
+        // 以内存方式加载音频：把整个文件读入字节数组并固定(pin)，再用 BASS 的内存流重载创建解码流。
+        // 这样 BASS 全程不持有任何音频文件句柄 —— 关谱面/换谱面后即可立即删除/移动源文件，
+        // 彻底解决 StreamFree 之后 .ogg/.mp3 文件句柄仍残留、被 MajdataEdit.exe 占用无法删除的问题。
+        // （上一次的缓冲已在前面的 FreeBgmStream() 中释放。）
+        _bgmFileBuffer = File.ReadAllBytes(audioPath);
+        _bgmFileHandle = GCHandle.Alloc(_bgmFileBuffer, GCHandleType.Pinned);
+        var decodeStream = Bass.BASS_StreamCreateFile(
+            _bgmFileHandle.AddrOfPinnedObject(), 0L, _bgmFileBuffer.LongLength, BASSFlag.BASS_STREAM_DECODE);
+        bgmSourceStream = decodeStream; // 显式跟踪源解码流，便于释放
+        bgmStream = BassFx.BASS_FX_TempoCreate(decodeStream, BASSFlag.BASS_DEFAULT);
         //Bass.BASS_StreamCreateFile(audioPath, 0L, 0L, BASSFlag.BASS_SAMPLE_FLOAT);
 
         Bass.BASS_ChannelSetAttribute(bgmStream, BASSAttribute.BASS_ATTRIB_VOL, editorSetting!.Default_BGM_Level);
@@ -294,7 +306,12 @@ public partial class MainWindow : Window
         ReadWaveFromFile();
         SimaiProcess.ClearData();
 
-        if (!SimaiProcess.ReadData(dataPath)) return;
+        if (!SimaiProcess.ReadData(dataPath))
+        {
+            // ReadData 失败时，释放本次刚分配的 BGM 资源
+            FreeBgmStream();
+            return;
+        }
 
 
         if (LevelSelector.Items.Count > 0)
@@ -320,24 +337,28 @@ public partial class MainWindow : Window
 
     private void ReadWaveFromFile()
     {
-        var bgmDecode = Bass.BASS_StreamCreateFile(maidataDir + "/" + currentTrackFilename, 0L, 0L, BASSFlag.BASS_STREAM_DECODE);
+        // 复用 initFromFile 已加载并固定的 _bgmFileBuffer，基于内存创建独立临时解码流读取波形。
+        // 不复用 bgmSourceStream：它正被 Tempo 流 bgmStream 占用，复用会破坏其播放位置。
+        var bgmDecode = Bass.BASS_StreamCreateFile(
+            _bgmFileHandle.AddrOfPinnedObject(), 0L, _bgmFileBuffer!.LongLength, BASSFlag.BASS_STREAM_DECODE);
         try
         {
             songLength = Bass.BASS_ChannelBytes2Seconds(bgmDecode,
                 Bass.BASS_ChannelGetLength(bgmDecode, BASSMode.BASS_POS_BYTE));
-/*                int sampleNumber = (int)((songLength * 1000) / (0.02f * 1000));
-                wavedBs = new float[sampleNumber];
-                for (int i = 0; i < sampleNumber; i++)
-                {
-                    wavedBs[i] = Bass.BASS_ChannelGetLevels(bgmDecode, 0.02f, BASSLevel.BASS_LEVEL_MONO)[0];
-                }*/
-            Bass.BASS_StreamFree(bgmDecode);
-            var bgmSample = Bass.BASS_SampleLoad(maidataDir + "/" + currentTrackFilename, 0, 0, 1, BASSFlag.BASS_DEFAULT);
-            var bgmInfo = Bass.BASS_SampleGetInfo(bgmSample);
+            var bgmInfo = Bass.BASS_ChannelGetInfo(bgmDecode);
             var freq = bgmInfo.freq;
             var sampleCount = (long)(songLength * freq * 2);
             var bgmRAW = new short[sampleCount];
-            Bass.BASS_SampleGetData(bgmSample, bgmRAW);
+            // 从内存解码流读取 16-bit PCM
+            var rawHandle = GCHandle.Alloc(bgmRAW, GCHandleType.Pinned);
+            try
+            {
+                Bass.BASS_ChannelGetData(bgmDecode, rawHandle.AddrOfPinnedObject(), (int)(sampleCount * 2));
+            }
+            finally
+            {
+                rawHandle.Free();
+            }
 
             waveRaws[0] = new short[sampleCount / 20 + 1];
             for (var i = 0; i < sampleCount; i = i + 20) waveRaws[0][i / 20] = bgmRAW[i];
@@ -349,8 +370,11 @@ public partial class MainWindow : Window
         catch (Exception e)
         {
             MessageBox.Show("mp3/ogg解码失败。\nMP3/OGG Decode fail.\n" + e.Message + Bass.BASS_ErrorGetCode());
-            Bass.BASS_StreamFree(bgmDecode);
             Process.Start("https://github.com/LingFeng-bbben/MajdataEdit/issues/26");
+        }
+        finally
+        {
+            Bass.BASS_StreamFree(bgmDecode);
         }
     }
 
@@ -362,6 +386,7 @@ public partial class MainWindow : Window
     public void ClearWindow(bool setEmpty = false)
     {
         ToggleStop();
+        FreeBgmStream();
 
         SaveSetting();
 
@@ -379,6 +404,32 @@ public partial class MainWindow : Window
         SetSavedState(true);
 
         if (setEmpty) set_empty();
+    }
+
+    /// <summary>
+    ///     Release the BGM (chart audio) stream if one is loaded.
+    ///     BGM 的源解码流基于内存缓冲创建，因此释放 BASS 流后还要解除缓冲的固定。
+    /// </summary>
+    private void FreeBgmStream()
+    {
+        // 先释放 Tempo 流，再显式释放源解码流，最后解除内存缓冲的固定。
+        if (bgmStream > 0)
+        {
+            Bass.BASS_ChannelStop(bgmStream);
+            Bass.BASS_StreamFree(bgmStream);
+            bgmStream = -114514;
+        }
+        if (bgmSourceStream > 0)
+        {
+            Bass.BASS_StreamFree(bgmSourceStream);
+            bgmSourceStream = -114514;
+        }
+        // 必须在两个流都释放之后再解除固定：流对象在存活期间引用这段内存。
+        if (_bgmFileHandle.IsAllocated)
+        {
+            _bgmFileHandle.Free();
+        }
+        _bgmFileBuffer = null;
     }
 
     /// <summary>
@@ -1205,7 +1256,7 @@ public partial class MainWindow : Window
         });
     }
     
-    private bool sendRequestStop()
+    private bool sendRequestStop(bool silentOnFailure = false)
     {
         var requestStop = new EditRequestjson
         {
@@ -1219,7 +1270,9 @@ public partial class MainWindow : Window
         var response = WebControl.RequestPOST("http://localhost:8013/", json);
         if (response == "ERROR")
         {
-            MessageBox.Show(GetLocalizedString("PortClear"));
+            // 换谱面/自动加载场景下 MajdataView 可能未在监听，静默忽略，避免干扰用户
+            if (!silentOnFailure)
+                MessageBox.Show(GetLocalizedString("PortClear"));
             return false;
         }
 

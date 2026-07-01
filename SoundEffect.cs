@@ -15,6 +15,14 @@ public partial class MainWindow
     public int answerStream = -114514;
 
     public int bgmStream = -114514;
+    // BGM 的源解码流。bgmStream 是基于它的 Tempo 流，必须显式跟踪并释放。
+    // 为彻底避免音频文件被占用，源解码流是基于内存（而非文件）创建的，见 initFromFile。
+    public int bgmSourceStream = -114514;
+    // BGM 音频的内存缓冲：把整个音频文件读入这里并固定(pin)，供 BASS 内存流使用。
+    // 这样 BASS 全程不持有文件句柄，关谱面/换谱面后即可删除/移动源文件。
+    // 该缓冲必须在 bgmStream / bgmSourceStream 释放之前保持固定（见 FreeBgmStream）。
+    private byte[]? _bgmFileBuffer;
+    private GCHandle _bgmFileHandle;
     public int breakSlideStartStream = -114514; // break-slide启动音效
     public int breakSlideStream = -114514; // break-slide欢呼声（critical perfect音效）
     public int breakStream = -114514; // 这个才是欢呼声
@@ -94,7 +102,10 @@ public partial class MainWindow
             timeEndPeriod(1);
         })
         {
-            Priority = ThreadPriority.Highest
+            Priority = ThreadPriority.Highest,
+            // 标记为后台线程：窗口关闭时即使未及时退出 while(isPlaying) 循环，
+            // 也不会阻止进程退出（依赖上面的 isPlaying=false 让其自然结束）。
+            IsBackground = true
         };
         thread.Start();
     }
@@ -437,6 +448,10 @@ public partial class MainWindow
         comparableBanks["Break Slide"] = breakSlideBank;
         comparableBanks["Judge Break Slide"] = judgeBreakSlideBank;
 
+        // 所有 SoundBank 创建完毕。后续逻辑（频率校验、Reassign 调 ffmpeg、混音写文件）均可能抛异常，
+        // 用 try/finally 保证已创建的 BASS sample 句柄在任何路径下都被释放，避免内存/句柄泄漏。
+        try
+        {
         foreach (var compPair in comparableBanks)
         {
             // Skip non existent file.
@@ -664,12 +679,16 @@ public partial class MainWindow
         File.WriteAllBytes(maidataDir + "/out.wav", filehead.ToArray());
 
         typeSamples.Clear();
-        bgmBank.Free();
-        comparableBanks.Values.ToList().ForEach(otherBank =>
+        }
+        finally
         {
-            if (otherBank.Temp) File.Delete(otherBank.FilePath);
-            otherBank.Free();
-        });
+            bgmBank.Free();
+            comparableBanks.Values.ToList().ForEach(otherBank =>
+            {
+                if (otherBank.Temp) File.Delete(otherBank.FilePath);
+                otherBank.Free();
+            });
+        }
     }
 
     /// <summary>
@@ -737,7 +756,14 @@ public partial class MainWindow
                 {
                     AutoReset = false
                 };
-                stopPlayingTimer.Elapsed += (sender, e) => { Dispatcher.Invoke(() => { ToggleStop(); }); };
+                // 回调触发后立即 Stop 并 Dispose 自身，避免每次走该分支都泄漏一个定时器。
+                stopPlayingTimer.Elapsed += (sender, e) =>
+                {
+                    Dispatcher.Invoke(() => { ToggleStop(); });
+                    var t = (Timer)sender!;
+                    t.Stop();
+                    t.Dispose();
+                };
                 stopPlayingTimer.Start();
             }
         }

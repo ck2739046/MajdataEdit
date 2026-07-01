@@ -195,6 +195,10 @@ namespace MajdataEdit
 
                 RunOnUi(() =>
                 {
+                    if (_mainWindow.isPlaying)
+                    {
+                        _mainWindow.TogglePause();
+                    }
                     if (!_mainWindow.IsSaved)
                     {
                         var result = MessageBox.Show(
@@ -209,6 +213,7 @@ namespace MajdataEdit
                     _mainWindow.initFromFile(folderPath, maidataFilename, trackFilename, movieFilename);
                     Console.WriteLine($"[ControlFileWatcher] Successfully loaded data from {folderPath}");
                 });
+                _isProcessing = false;
             }
             catch (Exception ex)
             {
