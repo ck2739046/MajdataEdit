@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Interop;
@@ -91,6 +92,11 @@ public partial class MainWindow : Window
         // 钩子 AvalonEdit 事件
         FumenContent.TextArea.Caret.PositionChanged += FumenContent_SelectionChanged;
         FumenContent.Document.TextChanged += FumenContent_TextChanged;
+        // BPM 拍号 hover：悬停到 (xxx) 时即时计算该处拍号并以 ToolTip 显示
+        FumenContent.TextArea.TextView.MouseHover += FumenContent_MouseHover;
+        FumenContent.TextArea.TextView.MouseHoverStopped += FumenContent_MouseHoverStopped;
+        // 滚动即关闭 tooltip，避免停留在已离开的位置
+        FumenContent.TextArea.TextView.ScrollOffsetChanged += FumenContent_ScrollChanged;
 
         chartChangeTimer.Elapsed += ChartChangeTimer_Elapsed;
         chartChangeTimer.AutoReset = false;
@@ -605,6 +611,50 @@ public partial class MainWindow : Window
     #endregion
 
     #region Text editor events
+
+    private ToolTip? _bpmToolTip;
+
+    private void FumenContent_MouseHover(object? sender, MouseEventArgs e)
+    {
+        var textArea = FumenContent.TextArea;
+        var textView = textArea.TextView;
+        var point = e.GetPosition(textView);
+        // e.GetPosition 返回视口相对坐标；须加 ScrollOffset 补偿。
+        // 此为 AvalonEdit 内部 OnMouseDown/OnQueryCursor 的约定写法（TextView.cs）。
+        var tvPos = textView.GetPosition(point + textView.ScrollOffset);
+        if (tvPos == null)
+            return;
+
+        var offset = FumenContent.Document.GetOffset(tvPos.Value.Location);
+        var hit = BpmMeasureCalculator.FindBpmAt(FumenContent.Document.Text, offset);
+        if (hit == null)
+        {
+            if (_bpmToolTip != null) _bpmToolTip.IsOpen = false;
+            return;
+        }
+
+        _bpmToolTip ??= new ToolTip();
+        _bpmToolTip.PlacementTarget = textView;
+        _bpmToolTip.Placement = PlacementMode.Relative;
+        // tooltip 的 Placement=Relative 相对 textView（视口）原点，定位须用视口坐标（不可加 ScrollOffset）。
+        _bpmToolTip.HorizontalOffset = point.X;
+        _bpmToolTip.VerticalOffset = point.Y + 16;
+        _bpmToolTip.Content = BpmMeasureCalculator.FormatMeasure(hit.Value.Measure);
+        _bpmToolTip.IsOpen = true;
+        e.Handled = true;
+    }
+
+    private void FumenContent_MouseHoverStopped(object? sender, MouseEventArgs e)
+    {
+        if (_bpmToolTip != null) _bpmToolTip.IsOpen = false;
+    }
+
+    private void FumenContent_ScrollChanged(object? sender, EventArgs e)
+    {
+        // ScrollOffsetChanged 是热路径事件（每帧触发）
+        // guard 仅在 tooltip 实际打开时才关闭，避免无谓赋值。
+        if (_bpmToolTip?.IsOpen == true) _bpmToolTip.IsOpen = false;
+    }
 
     private void FumenContent_SelectionChanged(object? sender, EventArgs e)
     {
