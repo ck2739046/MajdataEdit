@@ -17,7 +17,7 @@ public partial class HelpWindow : Window
             Make("SK_PlayPause", "Ctrl + Shift + C"),
             Make("SK_StopPlaying", "Ctrl + Shift + X"),
             Make("SK_SaveFile", "Ctrl + S"),
-            Make("SK_SendToView", "Ctrl + Shift + V"),
+            Make("SK_SendToView", "Ctrl + Shift + A"),
             Make("SK_IncreaseSpeed", "Ctrl + P"),
             Make("SK_DecreaseSpeed", "Ctrl + O"),
             Make("SK_Find", "Ctrl + F"),
