@@ -11,6 +11,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Threading;
 // using DiscordRPC.Logging;
 using MajdataEdit.AutoSaveModule;
 using Microsoft.Win32;
@@ -92,6 +93,17 @@ public partial class MainWindow : Window
         // 钩子 AvalonEdit 事件
         FumenContent.TextArea.Caret.PositionChanged += FumenContent_SelectionChanged;
         FumenContent.Document.TextChanged += FumenContent_TextChanged;
+        // 失焦时保留光标
+        // AvalonEdit 在 OnLostKeyboardFocus 里同步调用 Caret.Hide(),
+        // 该调用发生在 base.OnLostKeyboardFocus(触发外部 handler)之后,
+        // 直接在本事件里 Show() 会被随后的 Hide() 覆盖
+        // 
+        // 把 Show() 延后一个 dispatcher 周期, 让它在 Hide() 之后执行
+        FumenContent.TextArea.LostKeyboardFocus += (s, e) =>
+        {
+            Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                FumenContent.TextArea.Caret.Show()));
+        };
         // BPM 拍号 hover：悬停到 (xxx) 时即时计算该处拍号并以 ToolTip 显示
         FumenContent.TextArea.TextView.MouseHover += FumenContent_MouseHover;
         FumenContent.TextArea.TextView.MouseHoverStopped += FumenContent_MouseHoverStopped;
