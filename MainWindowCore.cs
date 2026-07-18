@@ -1343,7 +1343,6 @@ public partial class MainWindow : Window
 
         var json = JsonConvert.SerializeObject(jsonStruct);
         var path = maidataDir + "/majdata.json";
-        File.WriteAllText(path, json);
 
         var request = new EditRequestjson();
         if (playMethod == PlayMethod.Op)
@@ -1370,11 +1369,20 @@ public partial class MainWindow : Window
             request.moviePath = currentMovieFilename != null ? Path.Combine(maidataDir, currentMovieFilename) : null;
         });
 
+        request.chartJson = json;
         json = JsonConvert.SerializeObject(request);
-        
+
         // Broadcast to App in embed mode
-        BroadcastToApp(json);
-        
+        // UDP 不用发 chartJson
+        var appPayload = new
+        {
+            control = (int)request.control,
+            startTime = request.startTime,
+            audioSpeed = request.audioSpeed,
+            startAt = request.startAt
+        };
+        BroadcastToApp(JsonConvert.SerializeObject(appPayload));
+
         var response = WebControl.RequestPOST("http://localhost:8013/", json);
         if (response == "ERROR")
         {
