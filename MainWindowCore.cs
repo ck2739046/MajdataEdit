@@ -1342,7 +1342,7 @@ public partial class MainWindow : Window
         jsonStruct.diffNum = selectedDifficulty;
 
         var json = JsonConvert.SerializeObject(jsonStruct);
-        var path = maidataDir + "/majdata.json";
+        var path = Path.Combine(AppContext.BaseDirectory, "majdata.json");
         File.WriteAllText(path, json);
 
         var request = new EditRequestjson();
@@ -1356,6 +1356,7 @@ public partial class MainWindow : Window
         Dispatcher.Invoke(() =>
         {
             request.jsonPath = path;
+            request.maidataPath = maidataDir;
             request.startAt = StartAt.Ticks;
             request.startTime =
                 (float)Bass.BASS_ChannelBytes2Seconds(bgmStream, Bass.BASS_ChannelGetPosition(bgmStream));
