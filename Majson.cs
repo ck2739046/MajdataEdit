@@ -25,7 +25,6 @@ internal class EditRequestjson
     public bool smoothSlideAnime;
     public string? moviePath;
     public int appPort;
-    public string? chartJson;
 }
 
 public enum EditorComboIndicator
