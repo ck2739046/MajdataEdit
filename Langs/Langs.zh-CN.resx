@@ -440,6 +440,15 @@
   <data name="SK_Function" xml:space="preserve">
     <value>功能</value>
   </data>
+  <data name="SK_FeatureTitle" xml:space="preserve">
+    <value>特色功能</value>
+  </data>
+  <data name="SK_FeatureBpmHover" xml:space="preserve">
+    <value>悬停在 BPM 上：显示该 BPM 变化点的拍号。</value>
+  </data>
+  <data name="SK_FeatureLineNumberHover" xml:space="preserve">
+    <value>悬停在行号上：显示该行起始位置的拍号。</value>
+  </data>
   <data name="SK_ShortcutKey" xml:space="preserve">
     <value>快捷键</value>
   </data>

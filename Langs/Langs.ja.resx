@@ -472,6 +472,15 @@ Press the Insert key to switch back to normal mode.</value>
   <data name="SK_Function" xml:space="preserve">
     <value>機能</value>
   </data>
+  <data name="SK_FeatureTitle" xml:space="preserve">
+    <value>特色機能</value>
+  </data>
+  <data name="SK_FeatureBpmHover" xml:space="preserve">
+    <value>BPM にカーソルを合わせると、その BPM 変更位置の拍番号を表示します。</value>
+  </data>
+  <data name="SK_FeatureLineNumberHover" xml:space="preserve">
+    <value>行番号にカーソルを合わせると、その行の開始位置の拍番号を表示します。</value>
+  </data>
   <data name="SK_ShortcutKey" xml:space="preserve">
     <value>ショートカット</value>
   </data>

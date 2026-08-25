@@ -64,6 +64,19 @@
     </Window.Resources>
     <Grid>
         <TabControl Style="{StaticResource CenteredTabControl}">
+            <TabItem Header="{lex:Loc SK_FeatureTitle}" Style="{StaticResource DarkTabItem}">
+                <Border Margin="20" Padding="18"
+                        Background="{DynamicResource ButtonsBackground}"
+                        BorderBrush="{DynamicResource ButtonForeground}" BorderThickness="1">
+                    <StackPanel>
+                        <TextBlock Text="{lex:Loc SK_FeatureBpmHover}" FontSize="16"
+                                   TextWrapping="Wrap" Foreground="{DynamicResource ButtonForeground}" />
+                        <TextBlock Text="{lex:Loc SK_FeatureLineNumberHover}" Margin="0,24,0,0"
+                                   FontSize="16" TextWrapping="Wrap"
+                                   Foreground="{DynamicResource ButtonForeground}" />
+                    </StackPanel>
+                </Border>
+            </TabItem>
             <TabItem Header="{lex:Loc SK_TabShortcuts}" Style="{StaticResource DarkTabItem}">
                 <ListView x:Name="ShortcutList" Margin="6" FontSize="15"
                           Foreground="{DynamicResource ButtonForeground}"

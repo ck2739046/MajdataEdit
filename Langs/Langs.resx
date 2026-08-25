@@ -132,6 +132,15 @@
   <data name="SK_Function" xml:space="preserve">
     <value>Function</value>
   </data>
+  <data name="SK_FeatureTitle" xml:space="preserve">
+    <value>Features</value>
+  </data>
+  <data name="SK_FeatureBpmHover" xml:space="preserve">
+    <value>Hover over a BPM to show the measure at that BPM change.</value>
+  </data>
+  <data name="SK_FeatureLineNumberHover" xml:space="preserve">
+    <value>Hover over a line number to show the measure at the start of that line.</value>
+  </data>
   <data name="SK_ShortcutKey" xml:space="preserve">
     <value>Shortcut</value>
   </data>
