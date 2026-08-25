@@ -141,19 +141,19 @@
                             Margin="20,0">
                     <Image Source="pack://application:,,,/favicon.ico" Width="72" Height="72"
                            HorizontalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality"/>
-                    <TextBlock x:Name="AppNameText" Text="MajdataEdit" FontSize="22" FontWeight="Bold"
+                    <TextBlock x:Name="AppNameText" FontSize="22" FontWeight="Bold"
                                HorizontalAlignment="Center" Margin="0,12,0,0"
                                Foreground="{DynamicResource ButtonForeground}"/>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,14,0,0">
                         <TextBlock Text="{lex:Loc SK_Version}" Foreground="{DynamicResource ButtonForeground}"
                                    VerticalAlignment="Center"/>
-                        <TextBlock x:Name="VersionText" Text="v0.0.0" Margin="6,0,0,0"
+                        <TextBlock x:Name="VersionText" Margin="6,0,0,0"
                                    Foreground="{DynamicResource ButtonForeground}" VerticalAlignment="Center"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,0">
                         <TextBlock Text="{lex:Loc SK_Author}" Foreground="{DynamicResource ButtonForeground}"
                                    VerticalAlignment="Center"/>
-                        <TextBlock Text="bbben &amp; Simon273" Margin="6,0,0,0"
+                        <TextBlock x:Name="AuthorText" Margin="6,0,0,0"
                                    Foreground="{DynamicResource ButtonForeground}" VerticalAlignment="Center"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,0">

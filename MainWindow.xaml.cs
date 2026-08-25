@@ -417,14 +417,15 @@ public partial class MainWindow : Window
     private void MenuItem_GitHub_Click(object? sender, RoutedEventArgs e) => OpenGitHub();
 
     /// <summary>
-    /// 打开 GitHub 仓库页面。URL 取自 csproj 的 AssemblyTitle
+    /// 打开 GitHub 仓库页面。URL 取自 csproj 的 RepositoryUrl
     /// </summary>
     internal static void OpenGitHub()
     {
-        var attr = (System.Reflection.AssemblyTitleAttribute?)Attribute.GetCustomAttribute(
+        var url = System.Attribute.GetCustomAttributes(
             System.Reflection.Assembly.GetExecutingAssembly(),
-            typeof(System.Reflection.AssemblyTitleAttribute));
-        var url = attr?.Title;
+            typeof(System.Reflection.AssemblyMetadataAttribute))
+            .OfType<System.Reflection.AssemblyMetadataAttribute>()
+            .FirstOrDefault(attribute => attribute.Key == "RepositoryUrl")?.Value;
         if (!string.IsNullOrWhiteSpace(url))
             Process.Start(new ProcessStartInfo() { FileName = url, UseShellExecute = true });
     }

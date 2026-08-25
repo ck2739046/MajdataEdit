@@ -12,12 +12,13 @@
         <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
 
         <!-- Windows 文件属性 → 文件说明 -->
-        <AssemblyTitle>https://github.com/ck2739046/MajdataEdit/tree/v4.3.1</AssemblyTitle>
+        <AssemblyTitle>MajdataEdit</AssemblyTitle>
         <!-- Windows 文件属性 → 产品名称 -->
         <Product>MajdataEdit</Product>
 
-        <Authors>bbben &amp; Simon273</Authors>
-        <Copyright>©bbben &amp; Simon273 $([System.DateTime]::Now.ToString("yyyy.MM.dd_HH:mm:ss_UTCzzz"))</Copyright>
+        <Company>Simon273 (og: bbben)</Company>
+        <Copyright>© Simon273 (og: bbben) $([System.DateTime]::Now.ToString("yyyy.MM.dd_HH:mm:ss_UTCzzz"))</Copyright>
+        <RepositoryUrl>https://github.com/ck2739046/MajdataEdit/tree/v4.3.1</RepositoryUrl>
         <ApplicationIcon>favicon.ico</ApplicationIcon>
         <UseApplicationTrust>false</UseApplicationTrust>
         <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -78,5 +79,6 @@
          # License: MIT (electron/rcedit) -->
     <Target Name="FixOriginalFilename" AfterTargets="PostBuildEvent">
         <Exec Command="&quot;$(ProjectDir)tools\rcedit.exe&quot; &quot;$(TargetDir)$(AssemblyName).exe&quot; --set-version-string &quot;OriginalFilename&quot; &quot;&quot;" />
+        <Exec Command="&quot;$(ProjectDir)tools\rcedit.exe&quot; &quot;$(TargetDir)$(AssemblyName).exe&quot; --set-version-string &quot;Comments&quot; &quot;$(RepositoryUrl)&quot;" />
     </Target>
 </Project>

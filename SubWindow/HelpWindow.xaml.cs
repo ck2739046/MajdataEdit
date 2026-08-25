@@ -39,21 +39,27 @@ public partial class HelpWindow : Window
     private void FillAboutInfo()
     {
         var asm = Assembly.GetExecutingAssembly();
+        var product = asm.GetCustomAttribute<AssemblyProductAttribute>()?.Product;
+        AppNameText.Text = product ?? asm.GetName().Name ?? string.Empty;
+
+        var authors = asm.GetCustomAttribute<AssemblyCompanyAttribute>()?.Company;
+        AuthorText.Text = authors ?? string.Empty;
+
         var ver = asm.GetName().Version;
-        VersionText.Text = ver != null ? $"v{ver.ToString(3)}" : "v0.0.0";
+        VersionText.Text = ver != null ? $"v{ver.ToString(3)}" : string.Empty;
 
         var copyright = asm.GetCustomAttribute<AssemblyCopyrightAttribute>()?.Copyright;
         BuildDateText.Text = ExtractBuildDate(copyright) ?? "-";
 
-        // GitHub 完整 URL 取自 csproj 的 <AssemblyTitle>,显示与点击打开保持一致
-        var title = asm.GetCustomAttribute<AssemblyTitleAttribute>()?.Title;
-        if (!string.IsNullOrWhiteSpace(title))
-            GithubLink.Text = title;
+        var repositoryUrl = Attribute.GetCustomAttributes(asm, typeof(AssemblyMetadataAttribute))
+            .OfType<AssemblyMetadataAttribute>()
+            .FirstOrDefault(attribute => attribute.Key == "RepositoryUrl")?.Value;
+        if (!string.IsNullOrWhiteSpace(repositoryUrl))
+            GithubLink.Text = repositoryUrl;
     }
 
     /// <summary>
     /// 从 Copyright 字符串中解析构建时间戳。
-    /// csproj: ©bbben &amp; Simon273 yyyy.MM.dd_HH:mm:ss_UTCzzz
     /// </summary>
     private static string? ExtractBuildDate(string? copyright)
     {
