@@ -164,6 +164,56 @@ public static class BpmMeasureCalculator
         return hits;
     }
 
+    public static Fraction ComputeMeasureAtOffset(string text, int offset)
+    {
+        var position = Fraction.Zero;
+        long currentDiv = 4;
+        var limit = Math.Clamp(offset, 0, text.Length);
+        var i = 0;
+
+        while (i < limit)
+        {
+            var ch = text[i];
+
+            if (ch == '|' && i + 1 < text.Length && text[i + 1] == '|')
+            {
+                var lineEnd = text.IndexOf('\n', i);
+                i = lineEnd == -1 ? limit : Math.Min(lineEnd, limit);
+                continue;
+            }
+
+            if (ch == '{')
+            {
+                var j = text.IndexOf('}', i);
+                if (j != -1 && j < limit)
+                {
+                    var numStr = text.AsSpan(i + 1, j - i - 1).Trim();
+                    if (long.TryParse(numStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out var dv) && dv != 0)
+                        currentDiv = dv;
+                    i = j + 1;
+                    continue;
+                }
+            }
+
+            if (ch == '(')
+            {
+                var j = text.IndexOf(')', i);
+                if (j != -1 && j < limit && IsBpm(text.AsSpan(i + 1, j - i - 1).Trim().ToString()))
+                {
+                    i = j + 1;
+                    continue;
+                }
+            }
+
+            if (ch == ',')
+                position += new Fraction(1, currentDiv);
+
+            i++;
+        }
+
+        return position;
+    }
+
     /// <summary>
     /// 在文档 offset 处查找命中的 BPM 组：返回 [Start, End]（含两端括号）包含 offset 的 hit，否则 null。
     /// 用于鼠标 hover 定位光标是否在某个 (xxx) 上。

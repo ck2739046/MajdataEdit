@@ -14,6 +14,8 @@ using System.Windows.Media;
 using System.Windows.Threading;
 // using DiscordRPC.Logging;
 using MajdataEdit.AutoSaveModule;
+using ICSharpCode.AvalonEdit.Editing;
+using ICSharpCode.AvalonEdit.Rendering;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using Un4seen.Bass;
@@ -109,6 +111,14 @@ public partial class MainWindow : Window
         FumenContent.TextArea.TextView.MouseHoverStopped += FumenContent_MouseHoverStopped;
         // 滚动即关闭 tooltip，避免停留在已离开的位置
         FumenContent.TextArea.TextView.ScrollOffsetChanged += FumenContent_ScrollChanged;
+        var lineNumberMargin = FumenContent.TextArea.LeftMargins.OfType<LineNumberMargin>().FirstOrDefault();
+        if (lineNumberMargin != null)
+        {
+            _lineNumberMargin = lineNumberMargin;
+            _lineNumberHoverLogic = new MouseHoverLogic(lineNumberMargin);
+            _lineNumberHoverLogic.MouseHover += LineNumberMargin_MouseHover;
+            _lineNumberHoverLogic.MouseHoverStopped += LineNumberMargin_MouseHoverStopped;
+        }
 
         chartChangeTimer.Elapsed += ChartChangeTimer_Elapsed;
         chartChangeTimer.AutoReset = false;
@@ -237,6 +247,13 @@ public partial class MainWindow : Window
         waveStopMonitorTimer.Dispose();
         chartChangeTimer.Dispose();
         playbackSpeedHideTimer.Dispose();
+        if (_lineNumberHoverLogic != null)
+        {
+            _lineNumberHoverLogic.MouseHover -= LineNumberMargin_MouseHover;
+            _lineNumberHoverLogic.MouseHoverStopped -= LineNumberMargin_MouseHoverStopped;
+            _lineNumberHoverLogic.Dispose();
+            _lineNumberHoverLogic = null;
+        }
 
         // 正常退出
         SafeTerminationDetector.Of().RecordProgramClose();
@@ -625,6 +642,39 @@ public partial class MainWindow : Window
     #region Text editor events
 
     private ToolTip? _bpmToolTip;
+    private LineNumberMargin? _lineNumberMargin;
+    private MouseHoverLogic? _lineNumberHoverLogic;
+
+    private void LineNumberMargin_MouseHover(object? sender, MouseEventArgs e)
+    {
+        if (_lineNumberMargin == null) return;
+
+        var textView = FumenContent.TextArea.TextView;
+        var marginPoint = e.GetPosition(_lineNumberMargin);
+        var visualLine = textView.GetVisualLineFromVisualTop(marginPoint.Y + textView.VerticalOffset);
+        if (visualLine == null)
+        {
+            if (_bpmToolTip != null) _bpmToolTip.IsOpen = false;
+            return;
+        }
+
+        var line = visualLine.FirstDocumentLine;
+        var measure = BpmMeasureCalculator.ComputeMeasureAtOffset(
+            FumenContent.Document.Text,
+            line.Offset);
+        _bpmToolTip ??= new ToolTip();
+        _bpmToolTip.PlacementTarget = _lineNumberMargin;
+        _bpmToolTip.Placement = PlacementMode.Relative;
+        _bpmToolTip.HorizontalOffset = marginPoint.X;
+        _bpmToolTip.VerticalOffset = marginPoint.Y + 16;
+        _bpmToolTip.Content = BpmMeasureCalculator.FormatMeasure(measure);
+        _bpmToolTip.IsOpen = true;
+    }
+
+    private void LineNumberMargin_MouseHoverStopped(object? sender, MouseEventArgs e)
+    {
+        if (_bpmToolTip != null) _bpmToolTip.IsOpen = false;
+    }
 
     private void FumenContent_MouseHover(object? sender, MouseEventArgs e)
     {
@@ -696,6 +746,7 @@ public partial class MainWindow : Window
 
     private void FumenContent_TextChanged(object? sender, EventArgs e)
     {
+        if (_bpmToolTip?.IsOpen == true) _bpmToolTip.IsOpen = false;
         if (GetRawFumenText() == "" || isLoading) return;
         SetSavedState(false);
 
