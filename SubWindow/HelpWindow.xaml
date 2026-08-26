@@ -74,6 +74,9 @@
                         <TextBlock Text="{lex:Loc SK_FeatureLineNumberHover}" Margin="0,24,0,0"
                                    FontSize="16" TextWrapping="Wrap"
                                    Foreground="{DynamicResource ButtonForeground}" />
+                        <TextBlock Text="{lex:Loc SK_FeatureEyeButton}" Margin="0,24,0,0"
+                                   FontSize="16" TextWrapping="Wrap"
+                                   Foreground="{DynamicResource ButtonForeground}" />
                     </StackPanel>
                 </Border>
             </TabItem>

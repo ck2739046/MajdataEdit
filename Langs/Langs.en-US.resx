@@ -457,6 +457,9 @@ Click OK to start render.</value>
   <data name="SK_FeatureLineNumberHover" xml:space="preserve">
     <value>Hover over a line number to show the measure at the start of that line.</value>
   </data>
+  <data name="SK_FeatureEyeButton" xml:space="preserve">
+    <value>Click the "eye" button to the left of "FiNALE Rate" in the top-right of MajdataView to control whether the note data is visible.</value>
+  </data>
   <data name="SK_ShortcutKey" xml:space="preserve">
     <value>Shortcut</value>
   </data>

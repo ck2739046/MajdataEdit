@@ -444,10 +444,13 @@
     <value>特色功能</value>
   </data>
   <data name="SK_FeatureBpmHover" xml:space="preserve">
-    <value>悬停在 BPM 上：显示该 BPM 变化点的拍号。</value>
+    <value>悬停在 BPM 上，可显示该 BPM 变化点的拍号。</value>
   </data>
   <data name="SK_FeatureLineNumberHover" xml:space="preserve">
-    <value>悬停在行号上：显示该行起始位置的拍号。</value>
+    <value>悬停在行号上，可显示该行起始位置的拍号。</value>
+  </data>
+  <data name="SK_FeatureEyeButton" xml:space="preserve">
+    <value>点击 MajdataView 右上角 "FiNALE Rate" 左侧的 "眼睛" 按钮，可控制音符数据是否可见。</value>
   </data>
   <data name="SK_ShortcutKey" xml:space="preserve">
     <value>快捷键</value>
