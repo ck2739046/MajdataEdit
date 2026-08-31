@@ -1267,7 +1267,7 @@ public partial class MainWindow : Window
         // Broadcast to App in embed mode
         BroadcastToApp(json);
         
-        var response = WebControl.RequestPOST("http://localhost:8013/", json);
+        var response = WebControl.RequestPOST(WebControl.ViewUrl, json);
         if (response == "ERROR")
         {
             // 换谱面/自动加载场景下 MajdataView 可能未在监听，静默忽略，避免干扰用户
@@ -1289,7 +1289,7 @@ public partial class MainWindow : Window
         };
         var json = JsonConvert.SerializeObject(requestStop);
         
-        var response = WebControl.RequestPOST("http://localhost:8013/", json);
+        var response = WebControl.RequestPOST(WebControl.ViewUrl, json);
         if (response == "ERROR")
         {
             MessageBox.Show(GetLocalizedString("PortClear"));
@@ -1314,7 +1314,7 @@ public partial class MainWindow : Window
         // Broadcast to App in embed mode
         BroadcastToApp(json);
         
-        var response = WebControl.RequestPOST("http://localhost:8013/", json);
+        var response = WebControl.RequestPOST(WebControl.ViewUrl, json);
         if (response == "ERROR")
         {
             MessageBox.Show(GetLocalizedString("PortClear"));
@@ -1376,7 +1376,7 @@ public partial class MainWindow : Window
         // Broadcast to App in embed mode
         BroadcastToApp(json);
         
-        var response = WebControl.RequestPOST("http://localhost:8013/", json);
+        var response = WebControl.RequestPOST(WebControl.ViewUrl, json);
         if (response == "ERROR")
         {
             MessageBox.Show(GetLocalizedString("PortClear"));
